@@ -1,15 +1,24 @@
+#[derive(Copy, Clone)]
 pub struct Atom {
     x: i32,
     y: i32,
 }
 
-pub struct ObjState {
-    atoms: Vec<Atom>
+impl Atom {
+    pub fn get_pos(&self) -> (i32, i32) {
+        (self.x, self.y)
+    }
 }
 
-impl ObjState {
+pub type Atoms = Vec<Atom>;
+
+pub struct State {
+    atoms: Atoms
+}
+
+impl State {
     pub fn new() -> Self {
-        ObjState {
+        State {
             atoms: vec![]
         }
     }
@@ -22,6 +31,10 @@ impl ObjState {
                 y: 0,
             }
         );
+    }
+
+    pub fn get_atoms(&self) -> &Atoms {
+        &self.atoms
     }
 }
 
