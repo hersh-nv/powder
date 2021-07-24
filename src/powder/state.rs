@@ -13,28 +13,24 @@ impl Atom {
 pub type Atoms = Vec<Atom>;
 
 pub struct State {
-    atoms: Atoms
+    atoms: Atoms,
 }
 
 impl State {
     pub fn new() -> Self {
-        State {
-            atoms: vec![]
+        State { 
+            atoms: vec![],
         }
     }
 
     pub fn init(&mut self) {
         // stub init: make a single base atom
-        self.atoms.push(
-            Atom {
-                x: 0,
-                y: 0,
-            }
-        );
+        self.atoms.push(Atom { x: 0, y: 0 });
+        self.atoms.push(Atom { x: 10, y: 10 });
+        self.atoms.push(Atom { x: 50, y: 50 });
     }
 
     pub fn get_atoms(&self) -> &Atoms {
         &self.atoms
     }
 }
-
