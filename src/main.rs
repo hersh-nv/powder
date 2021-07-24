@@ -7,13 +7,7 @@ fn main() {
     .default_conf(c)
     .build()
     .expect("Couldn't build the ggez context");
-    let game = powder::Powder::new();
+    let game = powder::Powder::new(&mut ctx);
     
-    // graphics::set_screen_coordinates(&mut ctx, graphics::Rect::new(
-    //     0.0,
-    //     0.0,
-    //     50.0,
-    //     50.0,
-    // )).unwrap();
     event::run(ctx, event_loop, game)
 }
