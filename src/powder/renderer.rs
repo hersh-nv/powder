@@ -1,31 +1,24 @@
-use super::settings::*;
-use super::state::State;
 use super::assets::Assets;
+use super::settings::*;
 use super::state::Atoms;
-use ggez::{graphics, graphics::*, Context, GameResult, timer};
+use super::state::State;
+use ggez::{graphics, graphics::*, timer, Context, GameResult};
 use glam;
 
 type Point2 = glam::Vec2;
 
 fn draw_fps(ctx: &mut Context, frame: Rect, font: Option<Font>) -> GameResult<Text> {
-    let mut text = Text::new( TextFragment {
+    let mut text = Text::new(TextFragment {
         text: format!("{:.2}", timer::fps(ctx)),
         color: Some(Color::WHITE),
         font: font,
-        scale: Some(PxScale::from(20.0))
+        scale: Some(PxScale::from(20.0)),
     });
-    text.set_bounds(
-        Point2::new(frame.w, 100.0),
-        Align::Right,
-    );
+    text.set_bounds(Point2::new(frame.w, 100.0), Align::Right);
     Ok(text)
 }
 
-fn draw_atoms(
-    ctx: &mut Context,
-    sandbox: Rect,
-    atoms: &Atoms,
-) -> GameResult<Mesh> {
+fn draw_atoms(ctx: &mut Context, sandbox: Rect, atoms: &Atoms) -> GameResult<Mesh> {
     // println!("Drawing {} atoms", atoms.len());
     let mb = &mut MeshBuilder::new();
     for atom in atoms {
@@ -48,20 +41,11 @@ fn draw_atoms(
 
 fn draw_sandbox(ctx: &mut Context, sandbox: Rect) -> GameResult<Mesh> {
     MeshBuilder::new()
-        .rectangle(
-            DrawMode::stroke(1f32),
-            sandbox,
-            Color::WHITE,
-        )?
+        .rectangle(DrawMode::stroke(1f32), sandbox, Color::WHITE)?
         .build(ctx)
 }
 
-pub fn draw(
-    ctx: &mut Context, 
-    settings: &Settings, 
-    state: &State,
-    assets: &Assets
-) -> GameResult {
+pub fn draw(ctx: &mut Context, settings: &Settings, state: &State, assets: &Assets) -> GameResult {
     // refresh screen
     graphics::clear(ctx, Color::BLACK);
     // graphics::set_screen_coordinates(ctx, graphics::Rect::new(0f32, 0f32, 512f32, 512f32))?;
@@ -72,8 +56,11 @@ pub fn draw(
     // output drawing
     graphics::draw(ctx, &sandbox_m, DrawParam::default())?;
     graphics::draw(ctx, &atoms_m, DrawParam::default())?;
-    graphics::draw(ctx, &text, DrawParam::default()
-        .dest(Point2::new(settings.frame_fps.x, settings.frame_fps.y)))?;
+    graphics::draw(
+        ctx,
+        &text,
+        DrawParam::default().dest(Point2::new(settings.frame_fps.x, settings.frame_fps.y)),
+    )?;
     graphics::present(ctx)?;
     Ok(())
 }

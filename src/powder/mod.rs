@@ -1,9 +1,9 @@
 use ggez::*;
 
 mod assets;
+mod renderer;
 mod settings;
 mod state;
-mod renderer;
 
 use assets::Assets;
 use settings::Settings;

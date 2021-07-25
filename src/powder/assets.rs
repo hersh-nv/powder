@@ -1,4 +1,4 @@
-use ggez::{graphics::Font, GameResult, Context};
+use ggez::{graphics::Font, Context, GameResult};
 
 pub struct Assets {
     pub font: Font,
@@ -13,7 +13,7 @@ impl Assets {
                     println!("Failed to load font! Using default");
                     Font::default()
                 }
-            }
+            },
         })
     }
 }
