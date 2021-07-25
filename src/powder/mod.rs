@@ -1,6 +1,7 @@
 use ggez::*;
 
 mod assets;
+mod event_handles;
 mod renderer;
 mod settings;
 mod state;
@@ -36,6 +37,7 @@ impl Powder {
 }
 
 impl ggez::event::EventHandler<GameError> for Powder {
+    /* Required methods for EventHandler trait */
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         self.dt = timer::delta(ctx);
         Ok(())
@@ -45,5 +47,24 @@ impl ggez::event::EventHandler<GameError> for Powder {
         renderer::draw(ctx, &self.settings, &self.state, &self.assets)?;
         timer::yield_now();
         Ok(())
+    }
+
+    /* Optional methods, event handlers */
+    fn mouse_button_down_event(
+        &mut self,
+        ctx: &mut Context,
+        button: input::mouse::MouseButton,
+        x: f32,
+        y: f32,
+    ) {
+        event_handles::mouse_button_down_event(
+            ctx,
+            &mut self.state,
+            &mut self.settings,
+            button,
+            x,
+            y,
+        )
+        .expect("Failed mouse button down event");
     }
 }

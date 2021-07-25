@@ -19,18 +19,18 @@ fn draw_fps(ctx: &mut Context, frame: Rect, font: Option<Font>) -> GameResult<Te
 }
 
 fn draw_atoms(ctx: &mut Context, sandbox: Rect, atoms: &Atoms) -> GameResult<Mesh> {
-    // println!("Drawing {} atoms", atoms.len());
+    // TODO: proper co-ordinate conversion
     let mb = &mut MeshBuilder::new();
     for atom in atoms {
-        let x = atom.x + sandbox.x as i32;
-        let y = atom.y + sandbox.y as i32;
+        let x = atom.coord.x;
+        let y = atom.coord.y;
         mb.rectangle(
             DrawMode::fill(),
             Rect {
                 x: x as f32,
                 y: y as f32,
-                w: 5f32,
-                h: 5f32,
+                w: 1f32,
+                h: 1f32,
             },
             atom.color,
         )
@@ -50,12 +50,19 @@ pub fn draw(ctx: &mut Context, settings: &Settings, state: &State, assets: &Asse
     graphics::clear(ctx, Color::BLACK);
     // graphics::set_screen_coordinates(ctx, graphics::Rect::new(0f32, 0f32, 512f32, 512f32))?;
     // all drawing steps here
-    let sandbox_m = draw_sandbox(ctx, settings.sandbox)?;
-    let atoms_m = draw_atoms(ctx, settings.sandbox, state.get_atoms())?;
+    let sandbox_m = draw_sandbox(ctx, settings.frame_sandbox)?;
+    let atoms_m = draw_atoms(ctx, settings.frame_sandbox, state.get_atoms())?;
     let text = draw_fps(ctx, settings.frame_fps, Some(assets.font))?;
     // output drawing
     graphics::draw(ctx, &sandbox_m, DrawParam::default())?;
-    graphics::draw(ctx, &atoms_m, DrawParam::default())?;
+    graphics::draw(
+        ctx,
+        &atoms_m,
+        DrawParam::default().dest(Point2::new(
+            settings.frame_sandbox.x,
+            settings.frame_sandbox.y,
+        )),
+    )?;
     graphics::draw(
         ctx,
         &text,
