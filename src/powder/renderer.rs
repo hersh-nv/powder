@@ -1,9 +1,7 @@
 use super::assets::Assets;
-use super::settings::*;
 use super::state::Atoms;
 use super::state::State;
 use ggez::{graphics, graphics::*, timer, Context, GameResult};
-use glam;
 
 type Point2 = glam::Vec2;
 
@@ -45,28 +43,31 @@ fn draw_sandbox(ctx: &mut Context, sandbox: Rect) -> GameResult<Mesh> {
         .build(ctx)
 }
 
-pub fn draw(ctx: &mut Context, settings: &Settings, state: &State, assets: &Assets) -> GameResult {
+pub fn draw(ctx: &mut Context, state: &State, assets: &Assets) -> GameResult {
     // refresh screen
     graphics::clear(ctx, Color::BLACK);
     // all drawing steps here
-    let sandbox_m = draw_sandbox(ctx, settings.frame_sandbox)?;
-    let atoms_m = draw_atoms(ctx, settings.frame_sandbox, state.get_atoms())?;
-    let text = draw_fps(ctx, settings.frame_fps, Some(assets.font))?;
-    // output drawing
+    let sandbox_m = draw_sandbox(ctx, state.settings.frame_sandbox)?;
+    let atoms_m = draw_atoms(ctx, state.settings.frame_sandbox, state.get_atoms())?;
+    let text = draw_fps(ctx, state.settings.frame_fps, Some(assets.font))?;
     graphics::draw(ctx, &sandbox_m, DrawParam::default())?;
     graphics::draw(
         ctx,
         &atoms_m,
         DrawParam::default().dest(Point2::new(
-            settings.frame_sandbox.x,
-            settings.frame_sandbox.y,
+            state.settings.frame_sandbox.x,
+            state.settings.frame_sandbox.y,
         )),
     )?;
     graphics::draw(
         ctx,
         &text,
-        DrawParam::default().dest(Point2::new(settings.frame_fps.x, settings.frame_fps.y)),
+        DrawParam::default().dest(Point2::new(
+            state.settings.frame_fps.x,
+            state.settings.frame_fps.y,
+        )),
     )?;
+    // output drawing
     graphics::present(ctx)?;
     Ok(())
 }

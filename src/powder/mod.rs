@@ -3,17 +3,14 @@ use ggez::*;
 mod assets;
 mod event_handles;
 mod renderer;
-mod settings;
 mod state;
 
 use assets::Assets;
-use settings::Settings;
 use state::State;
 
 pub struct Powder {
     dt: std::time::Duration,
     state: state::State,
-    settings: Settings,
     assets: Assets,
 }
 
@@ -21,8 +18,7 @@ impl Powder {
     pub fn new(ctx: &mut Context) -> GameResult<Self> {
         let mut powder = Powder {
             dt: std::time::Duration::new(0, 0),
-            state: State::new(),
-            settings: Settings::new(ctx),
+            state: State::new(ctx),
             assets: Assets::new(ctx)?,
         };
         powder.init(ctx)?;
@@ -44,7 +40,7 @@ impl ggez::event::EventHandler<GameError> for Powder {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
-        renderer::draw(ctx, &self.settings, &self.state, &self.assets)?;
+        renderer::draw(ctx, &self.state, &self.assets)?;
         timer::yield_now();
         Ok(())
     }
@@ -57,14 +53,7 @@ impl ggez::event::EventHandler<GameError> for Powder {
         x: f32,
         y: f32,
     ) {
-        event_handles::mouse_button_down_event(
-            ctx,
-            &mut self.state,
-            &mut self.settings,
-            button,
-            x,
-            y,
-        )
-        .expect("Failed mouse button down event");
+        event_handles::mouse_button_down_event(ctx, &mut self.state, button, x, y)
+            .expect("Failed mouse button down event");
     }
 }
