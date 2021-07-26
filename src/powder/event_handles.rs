@@ -20,10 +20,10 @@ fn convert_coord_to_sandbox_coord(
         && (x < (settings.frame_sandbox.x + settings.frame_sandbox.w))
         && (y < (settings.frame_sandbox.y + settings.frame_sandbox.h))
     {
-        Ok(SandboxCoordinate::new(
-            (x - settings.frame_sandbox.x) as u16,
-            (y - settings.frame_sandbox.y) as u16,
-        ))
+        Ok(SandboxCoordinate {
+            x: (x - settings.frame_sandbox.x) as u16,
+            y: (y - settings.frame_sandbox.y) as u16,
+        })
     } else {
         Err(DrawError::OutOfSandboxError)
     }
