@@ -5,8 +5,13 @@
 use super::state::*;
 use ggez::*;
 
-enum DrawError {
-    OutOfSandboxError,
+#[derive(Debug)]
+pub struct EventHandlerError;
+
+impl std::fmt::Display for EventHandlerError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Couldn't handle event")
+    }
 }
 
 // helpers
@@ -14,7 +19,7 @@ fn convert_coord_to_sandbox_coord(
     settings: &settings::Settings,
     x: f32,
     y: f32,
-) -> Result<SandboxCoordinate, DrawError> {
+) -> Result<SandboxCoordinate, EventHandlerError> {
     if (x > settings.frame_sandbox.x)
         && (y > settings.frame_sandbox.y)
         && (x < (settings.frame_sandbox.x + settings.frame_sandbox.w))
@@ -25,7 +30,7 @@ fn convert_coord_to_sandbox_coord(
             y: (y - settings.frame_sandbox.y) as u16,
         })
     } else {
-        Err(DrawError::OutOfSandboxError)
+        Err(EventHandlerError)
     }
 }
 
