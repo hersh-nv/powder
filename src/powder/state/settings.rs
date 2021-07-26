@@ -22,9 +22,10 @@ pub struct Settings {
     pub frame_sandbox: Rect,
     pub frame_fps: Rect,
 
-    pub scaling_factor: u8,
+    pub scaling_factor: u16,
 
-    // TODO
+    // TODO: use this to cache the sandbox mesh (and any other Drawables that don't need to be
+    // regenerated every frame)
     pub mesh_sandbox: Option<graphics::Mesh>,
 }
 
@@ -32,16 +33,19 @@ impl Settings {
     pub fn new(ctx: &mut Context) -> Self {
         const DEF_SANDBOX_W: u16 = 512;
         const DEF_SANDBOX_H: u16 = 512;
-        const DEF_SCALING_FACTOR: u8 = 10;
+        const DEF_SCALING_FACTOR: u16 = 10;
 
         let (win_width, win_height) = graphics::drawable_size(ctx);
+        // align the sandbox to the grid scale
+        let sandbox_w = DEF_SANDBOX_W - DEF_SANDBOX_W % DEF_SCALING_FACTOR;
+        let sandbox_h = DEF_SANDBOX_H - DEF_SANDBOX_H % DEF_SCALING_FACTOR;
 
         // calc sandbox frame
         let frame_sandbox = Rect::new(
-            (win_width - DEF_SANDBOX_W as f32) / 2.0,
-            (win_height - DEF_SANDBOX_H as f32) / 2.0,
-            (DEF_SANDBOX_W) as f32,
-            (DEF_SANDBOX_H) as f32,
+            (win_width - sandbox_w as f32) / 2.0,
+            (win_height - sandbox_h as f32) / 2.0,
+            sandbox_w as f32,
+            sandbox_h as f32,
         );
 
         // calc fps frame
@@ -55,8 +59,8 @@ impl Settings {
         );
 
         Settings {
-            sandbox_w: DEF_SANDBOX_W,
-            sandbox_h: DEF_SANDBOX_W,
+            sandbox_w: sandbox_w,
+            sandbox_h: sandbox_h,
             frame_sandbox: frame_sandbox,
             frame_fps: frame_fps,
             scaling_factor: DEF_SCALING_FACTOR,
@@ -64,7 +68,7 @@ impl Settings {
         }
     }
 
-    pub fn set_scaling_factor(&mut self, sf: u8) -> Result<(), SettingsError> {
+    pub fn set_scaling_factor(&mut self, sf: u16) -> Result<(), SettingsError> {
         match sf {
             1..=10 => {
                 self.scaling_factor = sf;
@@ -74,7 +78,7 @@ impl Settings {
         }
     }
 
-    pub fn get_scaling_factor(&self) -> u8 {
+    pub fn get_scaling_factor(&self) -> u16 {
         self.scaling_factor
     }
 }
