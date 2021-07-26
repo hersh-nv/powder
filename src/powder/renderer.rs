@@ -48,7 +48,6 @@ fn draw_sandbox(ctx: &mut Context, sandbox: Rect) -> GameResult<Mesh> {
 pub fn draw(ctx: &mut Context, settings: &Settings, state: &State, assets: &Assets) -> GameResult {
     // refresh screen
     graphics::clear(ctx, Color::BLACK);
-    // graphics::set_screen_coordinates(ctx, graphics::Rect::new(0f32, 0f32, 512f32, 512f32))?;
     // all drawing steps here
     let sandbox_m = draw_sandbox(ctx, settings.frame_sandbox)?;
     let atoms_m = draw_atoms(ctx, settings.frame_sandbox, state.get_atoms())?;
