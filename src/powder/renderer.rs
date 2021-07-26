@@ -41,8 +41,9 @@ fn draw_sandbox(ctx: &mut Context, sandbox: Rect) -> GameResult<Mesh> {
     MeshBuilder::new()
         .rectangle(
             DrawMode::stroke(1f32),
-            Rect::new(0f32, 0f32, sandbox.w, sandbox.h), 
-            Color::WHITE)?
+            Rect::new(0f32, 0f32, sandbox.w, sandbox.h),
+            Color::WHITE,
+        )?
         .build(ctx)
 }
 
@@ -54,8 +55,8 @@ pub fn draw(ctx: &mut Context, state: &State, assets: &Assets) -> GameResult {
     let atoms_m = draw_atoms(ctx, state.get_atoms())?;
     let text = draw_fps(ctx, state.settings.frame_fps, Some(assets.font))?;
     graphics::draw(
-        ctx, 
-        &sandbox_m, 
+        ctx,
+        &sandbox_m,
         DrawParam::default().dest(Point2::new(
             state.settings.frame_sandbox.x,
             state.settings.frame_sandbox.y,

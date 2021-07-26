@@ -19,18 +19,10 @@ fn convert_coord_to_sandbox_coord(
     settings: &settings::Settings,
     x: f32,
     y: f32,
-) -> Result<SandboxCoordinate, EventHandlerError> {
-    if (x > settings.frame_sandbox.x)
-        && (y > settings.frame_sandbox.y)
-        && (x < (settings.frame_sandbox.x + settings.frame_sandbox.w))
-        && (y < (settings.frame_sandbox.y + settings.frame_sandbox.h))
-    {
-        Ok(SandboxCoordinate {
-            x: (x - settings.frame_sandbox.x) as u16,
-            y: (y - settings.frame_sandbox.y) as u16,
-        })
-    } else {
-        Err(EventHandlerError)
+) -> SandboxCoordinate {
+    SandboxCoordinate {
+        x: (x - settings.frame_sandbox.x) as u16,
+        y: (y - settings.frame_sandbox.y) as u16,
     }
 }
 
@@ -44,14 +36,17 @@ pub fn mouse_button_down_event(
 ) -> GameResult {
     match button {
         input::mouse::MouseButton::Left => {
-            println!("Handling LMB at ({},{})", x, y);
-            convert_coord_to_sandbox_coord(&state.settings, x, y).ok().map(|coord| {
-                println!("Making atom at ({}, {})", coord.x, coord.y);
-                // make atom
-                state.make_atom(coord, graphics::Color::WHITE);
-            });
+            println!("Handling LMB at ({}, {})", x, y);
+            let coord = convert_coord_to_sandbox_coord(&state.settings, x, y);
+            println!("Making atom at ({}, {})", coord.x, coord.y);
+            // make atom
+            state
+                .make_atom(coord, graphics::Color::WHITE)
+                .unwrap_or_else(|_| {
+                    println!("Atom out of bounds, not generating");
+                });
             Ok(())
-        },
-        _ => Ok(())
+        }
+        _ => Ok(()),
     }
 }
