@@ -5,6 +5,17 @@ use ggez::mint::Vector2;
 pub mod settings;
 use settings::*;
 
+/* Module error */
+#[derive(Debug)]
+pub struct StateError;
+
+impl std::fmt::Display for StateError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Couldn't make this state change")
+    }
+}
+
+/* Subtypes and structs */
 pub type SandboxCoordinate = Vector2<u16>;
 
 #[derive(Copy, Clone)]
@@ -15,6 +26,7 @@ pub struct Atom {
 
 pub type Atoms = Vec<Atom>;
 
+/* State */
 pub struct State {
     pub settings: Settings,
     atoms: Atoms,
@@ -38,7 +50,7 @@ impl State {
             .ok();
     }
 
-    pub fn make_atom(&mut self, coord: SandboxCoordinate, color: Color) -> GameResult {
+    pub fn make_atom(&mut self, coord: SandboxCoordinate, color: Color) -> Result<(), StateError> {
         self.atoms.push(Atom {
             coord: coord,
             color: color,

@@ -45,16 +45,13 @@ pub fn mouse_button_down_event(
     match button {
         input::mouse::MouseButton::Left => {
             println!("Handling LMB at ({},{})", x, y);
-            match convert_coord_to_sandbox_coord(&state.settings, x, y) {
-                Ok(coord) => {
-                    println!("Making atom at ({}, {})", coord.x, coord.y);
-                    // make atom
-                    state.make_atom(coord, graphics::Color::WHITE)?;
-                    Ok(())
-                }
-                Err(DrawError::OutOfSandboxError) => Ok(()),
-            }
-        }
-        _ => Ok(()),
+            convert_coord_to_sandbox_coord(&state.settings, x, y).ok().map(|coord| {
+                println!("Making atom at ({}, {})", coord.x, coord.y);
+                // make atom
+                state.make_atom(coord, graphics::Color::WHITE);
+            });
+            Ok(())
+        },
+        _ => Ok(())
     }
 }
