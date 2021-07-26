@@ -16,19 +16,19 @@ fn draw_fps(ctx: &mut Context, frame: Rect, font: Option<Font>) -> GameResult<Te
     Ok(text)
 }
 
-fn draw_atoms(ctx: &mut Context, atoms: &Atoms) -> GameResult<Mesh> {
+fn draw_atoms(ctx: &mut Context, atoms: &Atoms, scaling_factor: u16) -> GameResult<Mesh> {
     // TODO: proper co-ordinate conversion
     let mb = &mut MeshBuilder::new();
     for atom in atoms {
-        let x = atom.coord.x;
-        let y = atom.coord.y;
+        let x = atom.coord.x * scaling_factor;
+        let y = atom.coord.y * scaling_factor;
         mb.rectangle(
             DrawMode::fill(),
             Rect {
                 x: x as f32,
                 y: y as f32,
-                w: 1f32,
-                h: 1f32,
+                w: scaling_factor as f32,
+                h: scaling_factor as f32,
             },
             atom.color,
         )
@@ -52,7 +52,7 @@ pub fn draw(ctx: &mut Context, state: &State, assets: &Assets) -> GameResult {
     graphics::clear(ctx, Color::BLACK);
     // all drawing steps here
     let sandbox_m = draw_sandbox(ctx, state.settings.frame_sandbox)?;
-    let atoms_m = draw_atoms(ctx, state.get_atoms())?;
+    let atoms_m = draw_atoms(ctx, state.get_atoms(), state.settings.get_scaling_factor() as u16)?;
     let text = draw_fps(ctx, state.settings.frame_fps, Some(assets.font))?;
     graphics::draw(
         ctx,

@@ -15,14 +15,20 @@ impl std::fmt::Display for EventHandlerError {
 }
 
 // helpers
+fn click_in_rect(x: f32, y: f32, rect: graphics::Rect) -> bool {
+    x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h
+}
+
 fn convert_coord_to_sandbox_coord(
     settings: &settings::Settings,
     x: f32,
     y: f32,
 ) -> SandboxCoordinate {
+    // even though state.make_atom() checks invalid mutation, check here as well that we're not
+    // getting underflows or anything silly
     SandboxCoordinate {
-        x: (x - settings.frame_sandbox.x) as u16,
-        y: (y - settings.frame_sandbox.y) as u16,
+        x: (x - settings.frame_sandbox.x) as u16 / settings.get_scaling_factor() as u16,
+        y: (y - settings.frame_sandbox.y) as u16 / settings.get_scaling_factor() as u16,
     }
 }
 
@@ -36,16 +42,24 @@ pub fn mouse_button_down_event(
 ) -> GameResult {
     match button {
         input::mouse::MouseButton::Left => {
+            // handle LMB
             println!("Handling LMB at ({}, {})", x, y);
-            let coord = convert_coord_to_sandbox_coord(&state.settings, x, y);
-            println!("Making atom at ({}, {})", coord.x, coord.y);
-            // make atom
-            state
-                .make_atom(coord, graphics::Color::WHITE)
-                .unwrap_or_else(|_| {
-                    println!("Atom out of bounds, not generating");
-                });
-            Ok(())
+            // TODO: probably need to make this a match to determine which box got clicked
+            if click_in_rect(x, y, state.settings.frame_sandbox) {
+                // if clicked in sandbox
+                let coord = convert_coord_to_sandbox_coord(&state.settings, x, y);
+                println!("Making atom at ({}, {})", coord.x, coord.y);
+                state
+                    .make_atom(coord, graphics::Color::WHITE)
+                    .unwrap_or_else(|_| {
+                        println!("S: Atom out of bounds, not generating");
+                    });
+                Ok(())
+            } else {
+                // if clicked outside of sandbox
+                println!("EH: Atom out of bounds, not generating");
+                return Ok(());
+            }
         }
         _ => Ok(()),
     }

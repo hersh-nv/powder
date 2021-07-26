@@ -32,7 +32,7 @@ impl Settings {
     pub fn new(ctx: &mut Context) -> Self {
         const DEF_SANDBOX_W: u16 = 512;
         const DEF_SANDBOX_H: u16 = 512;
-        const DEF_SCALING_FACTOR: u8 = 1;
+        const DEF_SCALING_FACTOR: u8 = 10;
 
         let (win_width, win_height) = graphics::drawable_size(ctx);
 
@@ -66,7 +66,7 @@ impl Settings {
 
     pub fn set_scaling_factor(&mut self, sf: u8) -> Result<(), SettingsError> {
         match sf {
-            1..=3 => {
+            1..=10 => {
                 self.scaling_factor = sf;
                 Ok(())
             }
