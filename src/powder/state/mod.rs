@@ -56,9 +56,27 @@ impl State {
         !(coord.x > self.settings.sandbox_w || coord.y > self.settings.sandbox_h)
     }
 
+    fn atom_collision(&self, coord: SandboxCoordinate) -> bool {
+        // TODO: optimise
+        for atom in &self.atoms {
+            if coord.x != atom.coord.x {
+                continue;
+            } else {
+                if coord.y != atom.coord.y {
+                    continue;
+                } else {
+                    return true
+                }
+            }
+        }
+        false
+    }
+
     pub fn make_atom(&mut self, coord: SandboxCoordinate, color: Color) -> Result<(), StateError> {
         if !self.atom_in_bounds(coord) {
-            Err(StateError)
+            Err(StateError { msg: String::from("Atom out of bounds")})
+        } else if self.atom_collision(coord) {
+            Err(StateError { msg: String::from("Atom already exists here")})
         } else {
             self.atoms.push(Atom {
                 coord: coord,
