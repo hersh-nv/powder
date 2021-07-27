@@ -51,8 +51,8 @@ pub fn mouse_button_down_event(
                 println!("Making atom at ({}, {})", coord.x, coord.y);
                 state
                     .make_atom(coord, graphics::Color::WHITE)
-                    .unwrap_or_else(|_| {
-                        println!("S: Atom out of bounds, not generating");
+                    .unwrap_or_else(|err| {
+                        println!("State error:\n  {}", err);
                     });
                 Ok(())
             } else {

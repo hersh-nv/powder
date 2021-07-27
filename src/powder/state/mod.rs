@@ -7,11 +7,13 @@ use settings::*;
 
 /* Module error */
 #[derive(Debug)]
-pub struct StateError;
+pub struct StateError {
+    msg: String,
+}
 
 impl std::fmt::Display for StateError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Couldn't make this state change")
+        write!(f, "Couldn't make this state change\n{}", self.msg)
     }
 }
 
@@ -46,7 +48,7 @@ impl State {
             .ok();
         self.make_atom(SandboxCoordinate { x: 10, y: 10 }, Color::BLUE)
             .ok();
-        self.make_atom(SandboxCoordinate { x: 50, y: 50 }, Color::GREEN)
+        self.make_atom(SandboxCoordinate { x: 20, y: 20 }, Color::GREEN)
             .ok();
     }
 
