@@ -2,8 +2,11 @@
 // Maybe this interface to main should be defined in a trait first?
 // Regardless, event handlers get access to everything the relevant EventHandler method defines.
 
+use anyhow::Error;
+
 use super::state::*;
 use ggez::*;
+use log::*;
 
 #[derive(Debug)]
 pub struct EventHandlerError;
@@ -34,30 +37,29 @@ fn convert_coord_to_sandbox_coord(
 
 // handlers
 pub fn mouse_button_down_event(
-    ctx: &mut Context,
+    _ctx: &mut Context,
     state: &mut State,
     button: input::mouse::MouseButton,
     x: f32,
     y: f32,
-) -> GameResult {
+) -> Result<(), Error> {
     match button {
         input::mouse::MouseButton::Left => {
             // handle LMB
-            println!("Handling LMB at ({}, {})", x, y);
+            debug!("Handling LMB at ({}, {})", x, y);
             // TODO: probably need to make this a match to determine which box got clicked
             if click_in_rect(x, y, state.settings.frame_sandbox) {
                 // if clicked in sandbox
                 let coord = convert_coord_to_sandbox_coord(&state.settings, x, y);
-                println!("Making atom at ({}, {})", coord.x, coord.y);
+                info!("Making atom at ({}, {})", coord.x, coord.y);
                 state
                     .make_atom(coord, graphics::Color::WHITE)
-                    .unwrap_or_else(|err| {
-                        println!("State error:\n  {}", err);
-                    });
+                    .map_err(|err| info!("{}", err))
+                    .ok();
                 Ok(())
             } else {
                 // if clicked outside of sandbox
-                println!("EH: Atom out of bounds, not generating");
+                debug!("EH: Atom out of bounds, not generating");
                 return Ok(());
             }
         }

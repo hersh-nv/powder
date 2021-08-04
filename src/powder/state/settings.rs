@@ -33,7 +33,7 @@ impl Settings {
     pub fn new(ctx: &mut Context) -> Self {
         const DEF_SANDBOX_W: u16 = 512;
         const DEF_SANDBOX_H: u16 = 512;
-        const DEF_SCALING_FACTOR: u16 = 10;
+        const DEF_SCALING_FACTOR: u16 = 5;
 
         let (win_width, win_height) = graphics::drawable_size(ctx);
         // align the sandbox to the grid scale

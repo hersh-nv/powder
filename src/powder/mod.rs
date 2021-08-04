@@ -1,3 +1,4 @@
+use log::{debug};
 use ggez::*;
 
 mod assets;
@@ -25,8 +26,8 @@ impl Powder {
         Ok(powder)
     }
 
-    fn init(&mut self, ctx: &mut Context) -> GameResult {
-        println!("Core init");
+    fn init(&mut self, _ctx: &mut Context) -> GameResult {
+        debug!("Core init");
         self.state.init();
         Ok(())
     }

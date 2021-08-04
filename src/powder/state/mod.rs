@@ -1,3 +1,7 @@
+use anyhow::Result;
+use log::{error};
+use thiserror::Error;
+
 use ggez::graphics::Color;
 use ggez::mint::Vector2;
 use ggez::Context;
@@ -6,15 +10,10 @@ pub mod settings;
 use settings::*;
 
 /* Module error */
-#[derive(Debug)]
-pub struct StateError {
-    msg: String,
-}
-
-impl std::fmt::Display for StateError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Couldn't make this state change\n{}", self.msg)
-    }
+#[derive(Error, Debug)]
+pub enum StateError {
+    #[error("Couldn't change atom state: {0}")]
+    AtomError(String),
 }
 
 /* Subtypes and structs */
@@ -24,6 +23,7 @@ pub type SandboxCoordinate = Vector2<u16>;
 pub struct Atom {
     pub coord: SandboxCoordinate,
     pub color: Color,
+    pub vel: Vector2<u16>,
 }
 
 pub type Atoms = Vec<Atom>;
@@ -65,7 +65,7 @@ impl State {
                 if coord.y != atom.coord.y {
                     continue;
                 } else {
-                    return true
+                    return true;
                 }
             }
         }
@@ -74,13 +74,16 @@ impl State {
 
     pub fn make_atom(&mut self, coord: SandboxCoordinate, color: Color) -> Result<(), StateError> {
         if !self.atom_in_bounds(coord) {
-            Err(StateError { msg: String::from("Atom out of bounds")})
+            Err(StateError::AtomError(String::from("Atom out of bounds")))
         } else if self.atom_collision(coord) {
-            Err(StateError { msg: String::from("Atom already exists here")})
+            Err(StateError::AtomError(String::from(
+                "Atom already exists here",
+            )))
         } else {
             self.atoms.push(Atom {
                 coord: coord,
                 color: color,
+                vel: Vector2 { x: 0, y: 0 },
             });
             Ok(())
         }

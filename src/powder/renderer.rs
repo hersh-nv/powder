@@ -52,7 +52,11 @@ pub fn draw(ctx: &mut Context, state: &State, assets: &Assets) -> GameResult {
     graphics::clear(ctx, Color::BLACK);
     // all drawing steps here
     let sandbox_m = draw_sandbox(ctx, state.settings.frame_sandbox)?;
-    let atoms_m = draw_atoms(ctx, state.get_atoms(), state.settings.get_scaling_factor() as u16)?;
+    let atoms_m = draw_atoms(
+        ctx,
+        state.get_atoms(),
+        state.settings.get_scaling_factor() as u16,
+    )?;
     let text = draw_fps(ctx, state.settings.frame_fps, Some(assets.font))?;
     graphics::draw(
         ctx,
