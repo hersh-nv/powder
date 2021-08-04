@@ -36,6 +36,11 @@ fn convert_coord_to_sandbox_coord(
 }
 
 // handlers
+pub fn update(ctx: &mut Context, _state: &mut State) -> Result<(), Error> {
+    debug!("Frame length: {}", timer::delta(ctx).as_millis());
+    Ok(())
+}
+
 pub fn mouse_button_down_event(
     _ctx: &mut Context,
     state: &mut State,

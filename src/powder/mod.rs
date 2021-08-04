@@ -10,7 +10,6 @@ use assets::Assets;
 use state::State;
 
 pub struct Powder {
-    dt: std::time::Duration,
     state: state::State,
     assets: Assets,
 }
@@ -18,7 +17,6 @@ pub struct Powder {
 impl Powder {
     pub fn new(ctx: &mut Context) -> GameResult<Self> {
         let mut powder = Powder {
-            dt: std::time::Duration::new(0, 0),
             state: State::new(ctx),
             assets: Assets::new(ctx)?,
         };
@@ -36,7 +34,7 @@ impl Powder {
 impl ggez::event::EventHandler<GameError> for Powder {
     /* Required methods for EventHandler trait */
     fn update(&mut self, ctx: &mut Context) -> GameResult {
-        self.dt = timer::delta(ctx);
+        event_handles::update(ctx, &mut self.state).ok();
         Ok(())
     }
 
