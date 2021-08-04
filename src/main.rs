@@ -1,9 +1,12 @@
+use env_logger::fmt::TimestampPrecision;
 use log::{debug, info};
 use ggez::*;
 mod powder;
 
 fn main() {
-    env_logger::init();
+    env_logger::builder()
+        .format_timestamp(Some(TimestampPrecision::Millis))
+        .init();
     info!("Starting");
     let c = conf::Conf::new();
     let (mut ctx, event_loop) = ContextBuilder::new("powder", "hersh")
