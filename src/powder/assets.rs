@@ -1,5 +1,5 @@
 use ggez::{graphics::Font, Context, GameResult};
-use log::{warn};
+use log::warn;
 
 pub struct Assets {
     pub font: Font,

@@ -1,6 +1,6 @@
 use env_logger::fmt::TimestampPrecision;
-use log::{debug, info};
 use ggez::*;
+use log::{debug, info};
 mod powder;
 
 fn main() {

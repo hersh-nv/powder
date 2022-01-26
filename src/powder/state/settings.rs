@@ -19,6 +19,8 @@ impl std::fmt::Display for SettingsError {
 pub struct Settings {
     pub sandbox_w: u16,
     pub sandbox_h: u16,
+    pub sandbox_max_coord_w: u16,
+    pub sandbox_max_coord_h: u16,
     pub frame_sandbox: Rect,
     pub frame_fps: Rect,
 
@@ -33,7 +35,7 @@ impl Settings {
     pub fn new(ctx: &mut Context) -> Self {
         const DEF_SANDBOX_W: u16 = 512;
         const DEF_SANDBOX_H: u16 = 512;
-        const DEF_SCALING_FACTOR: u16 = 5;
+        const DEF_SCALING_FACTOR: u16 = 10;
 
         let (win_width, win_height) = graphics::drawable_size(ctx);
         // align the sandbox to the grid scale
@@ -61,6 +63,8 @@ impl Settings {
         Settings {
             sandbox_w: sandbox_w,
             sandbox_h: sandbox_h,
+            sandbox_max_coord_w: sandbox_w / DEF_SCALING_FACTOR,
+            sandbox_max_coord_h: sandbox_h / DEF_SCALING_FACTOR,
             frame_sandbox: frame_sandbox,
             frame_fps: frame_fps,
             scaling_factor: DEF_SCALING_FACTOR,

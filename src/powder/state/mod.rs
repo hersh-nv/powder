@@ -1,5 +1,5 @@
 use anyhow::Result;
-use log::{error};
+use log::error;
 use thiserror::Error;
 
 use ggez::graphics::Color;
@@ -26,7 +26,17 @@ pub struct Atom {
     pub vel: Vector2<u16>,
 }
 
+impl Atom {
+    pub fn change_pos(&mut self, d: Vector2<u16>) -> Result<(), StateError> {
+        self.coord.x = self.coord.x + d.x;
+        self.coord.y = self.coord.y + d.y;
+        Ok(())
+    }
+}
+
 pub type Atoms = Vec<Atom>;
+
+// pub type Field = [Vector2; ]
 
 /* State */
 pub struct State {
@@ -91,5 +101,13 @@ impl State {
 
     pub fn get_atoms(&self) -> &Atoms {
         &self.atoms
+    }
+
+    pub fn get_atoms_mut(&mut self) -> &mut Atoms {
+        &mut self.atoms
+    }
+
+    pub fn apply_field(&mut self) {
+        // TODO
     }
 }

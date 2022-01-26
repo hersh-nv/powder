@@ -1,5 +1,5 @@
-use log::{debug};
 use ggez::*;
+use log::debug;
 
 mod assets;
 mod event_handles;
