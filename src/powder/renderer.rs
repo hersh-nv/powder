@@ -1,18 +1,19 @@
 use super::assets::Assets;
 use super::state::Atoms;
 use super::state::State;
-use ggez::{graphics, graphics::*, timer, Context, GameResult};
+use ggez::{graphics::*, timer, Context, GameResult};
 
 type Point2 = glam::Vec2;
 
-fn draw_fps(ctx: &mut Context, frame: Rect, font: Option<Font>) -> GameResult<Text> {
+fn draw_fps(ctx: &mut Context, frame: Rect, font: &Option<String>) -> GameResult<Text> {
     let mut text = Text::new(TextFragment {
         text: format!("{:.2}", timer::fps(ctx)),
         color: Some(Color::WHITE),
-        font: font,
+        font: font.clone(),
         scale: Some(PxScale::from(20.0)),
     });
-    text.set_bounds(Point2::new(frame.w, 100.0), Align::Right);
+    text.set_bounds(Point2::new(frame.w, 100.0));
+    text.set_layout(TextLayout { h_align: TextAlign::End, v_align: TextAlign::Middle });
     Ok(text)
 }
 
@@ -34,22 +35,22 @@ fn draw_atoms(ctx: &mut Context, atoms: &Atoms, scaling_factor: u16) -> GameResu
         )
         .expect("Couldn't draw atom");
     }
-    mb.build(ctx)
+    Ok(Mesh::from_data(ctx, mb.build()))
 }
 
 fn draw_sandbox(ctx: &mut Context, sandbox: Rect) -> GameResult<Mesh> {
-    MeshBuilder::new()
+    Ok(Mesh::from_data(ctx, MeshBuilder::new()
         .rectangle(
             DrawMode::stroke(1f32),
             Rect::new(0f32, 0f32, sandbox.w, sandbox.h),
             Color::WHITE,
         )?
-        .build(ctx)
+        .build()))
 }
 
 pub fn draw(ctx: &mut Context, state: &State, assets: &Assets) -> GameResult {
     // refresh screen
-    graphics::clear(ctx, Color::BLACK);
+    let mut canvas = Canvas::from_frame(ctx, Color::BLACK);
     // all drawing steps here
     let sandbox_m = draw_sandbox(ctx, state.settings.frame_sandbox)?;
     let atoms_m = draw_atoms(
@@ -57,32 +58,29 @@ pub fn draw(ctx: &mut Context, state: &State, assets: &Assets) -> GameResult {
         state.get_atoms(),
         state.settings.get_scaling_factor() as u16,
     )?;
-    let text = draw_fps(ctx, state.settings.frame_fps, Some(assets.font))?;
-    graphics::draw(
-        ctx,
+    let text = draw_fps(ctx, state.settings.frame_fps, &assets.font)?;
+    canvas.draw(
         &sandbox_m,
         DrawParam::default().dest(Point2::new(
             state.settings.frame_sandbox.x,
             state.settings.frame_sandbox.y,
         )),
-    )?;
-    graphics::draw(
-        ctx,
+    );
+    canvas.draw(
         &atoms_m,
         DrawParam::default().dest(Point2::new(
             state.settings.frame_sandbox.x,
             state.settings.frame_sandbox.y,
         )),
-    )?;
-    graphics::draw(
-        ctx,
+    );
+    canvas.draw(
         &text,
         DrawParam::default().dest(Point2::new(
             state.settings.frame_fps.x,
             state.settings.frame_fps.y,
         )),
-    )?;
+    );
     // output drawing
-    graphics::present(ctx)?;
+    canvas.finish(ctx)?;
     Ok(())
 }

@@ -37,7 +37,7 @@ impl Settings {
         const DEF_SANDBOX_H: u16 = 512;
         const DEF_SCALING_FACTOR: u16 = 10;
 
-        let (win_width, win_height) = graphics::drawable_size(ctx);
+        let (win_width, win_height) = ctx.gfx.drawable_size();
         // align the sandbox to the grid scale
         let sandbox_w = DEF_SANDBOX_W - DEF_SANDBOX_W % DEF_SCALING_FACTOR;
         let sandbox_h = DEF_SANDBOX_H - DEF_SANDBOX_H % DEF_SCALING_FACTOR;

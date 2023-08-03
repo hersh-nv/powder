@@ -48,7 +48,7 @@ pub fn mouse_button_down_event(
     button: input::mouse::MouseButton,
     x: f32,
     y: f32,
-) -> Result<(), Error> {
+) -> GameResult {
     match button {
         input::mouse::MouseButton::Left => {
             // handle LMB
