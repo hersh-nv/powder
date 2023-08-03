@@ -14,7 +14,7 @@ fn main() {
         .expect("Couldn't build the ggez context");
     debug!("Context built");
     debug!("Writing game config");
-    filesystem::write_config(&mut ctx, &c).expect("Couldn't write config");
+    // filesystem::write_config(&mut ctx, &c).expect("Couldn't write config");
     debug!("Initialising game core");
     let game = powder::Powder::new(&mut ctx).expect("Could not run game core");
 
