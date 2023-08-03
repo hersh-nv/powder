@@ -8,7 +8,7 @@ fn main() {
         .format_timestamp(Some(TimestampPrecision::Millis))
         .init();
     info!("Starting");
-    let c = conf::Conf::new();
+    // let c = conf::Conf::new();
     let (mut ctx, event_loop) = ContextBuilder::new("powder", "hersh")
         .build()
         .expect("Couldn't build the ggez context");

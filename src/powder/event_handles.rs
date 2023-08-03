@@ -5,7 +5,6 @@
 use anyhow::Error;
 
 use super::state::*;
-use ggez::mint::Vector2;
 use ggez::*;
 use log::*;
 
@@ -37,7 +36,7 @@ fn convert_coord_to_sandbox_coord(
 }
 
 // handlers
-pub fn update(ctx: &mut Context, state: &mut State) -> Result<(), Error> {
+pub fn update(_ctx: &mut Context, _state: &mut State) -> Result<(), Error> {
     // debug!("Frame length: {}", timer::delta(ctx).as_millis());
     Ok(())
 }

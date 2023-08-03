@@ -1,13 +1,13 @@
 use super::assets::Assets;
 use super::state::Atoms;
 use super::state::State;
-use ggez::{graphics::*, timer, Context, GameResult};
+use ggez::{graphics::*, Context, GameResult};
 
 type Point2 = glam::Vec2;
 
 fn draw_fps(ctx: &mut Context, frame: Rect, font: &Option<String>) -> GameResult<Text> {
     let mut text = Text::new(TextFragment {
-        text: format!("{:.2}", timer::fps(ctx)),
+        text: format!("{:.2}", ctx.time.fps()),
         color: Some(Color::WHITE),
         font: font.clone(),
         scale: Some(PxScale::from(20.0)),
