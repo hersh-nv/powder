@@ -17,14 +17,14 @@ impl std::fmt::Display for SettingsError {
 }
 
 pub struct Settings {
-    pub sandbox_w: u16,
-    pub sandbox_h: u16,
-    pub sandbox_max_coord_w: u16,
-    pub sandbox_max_coord_h: u16,
+    pub sandbox_w: i32,
+    pub sandbox_h: i32,
+    pub sandbox_max_coord_w: i32,
+    pub sandbox_max_coord_h: i32,
     pub frame_sandbox: Rect,
     pub frame_fps: Rect,
 
-    pub scaling_factor: u16,
+    pub scaling_factor: i32,
 
     // TODO: use this to cache the sandbox mesh (and any other Drawables that don't need to be
     // regenerated every frame)
@@ -33,9 +33,9 @@ pub struct Settings {
 
 impl Settings {
     pub fn new(ctx: &mut Context) -> Self {
-        const DEF_SANDBOX_W: u16 = 512;
-        const DEF_SANDBOX_H: u16 = 512;
-        const DEF_SCALING_FACTOR: u16 = 10;
+        const DEF_SANDBOX_W: i32 = 512;
+        const DEF_SANDBOX_H: i32 = 512;
+        const DEF_SCALING_FACTOR: i32 = 10;
 
         let (win_width, win_height) = ctx.gfx.drawable_size();
         // align the sandbox to the grid scale
@@ -72,7 +72,7 @@ impl Settings {
         }
     }
 
-    pub fn set_scaling_factor(&mut self, sf: u16) -> Result<(), SettingsError> {
+    pub fn set_scaling_factor(&mut self, sf: i32) -> Result<(), SettingsError> {
         match sf {
             1..=10 => {
                 self.scaling_factor = sf;
@@ -82,7 +82,7 @@ impl Settings {
         }
     }
 
-    pub fn get_scaling_factor(&self) -> u16 {
+    pub fn get_scaling_factor(&self) -> i32 {
         self.scaling_factor
     }
 }
