@@ -5,6 +5,7 @@
 use anyhow::Error;
 
 use super::state::*;
+use super::Renderer;
 use ggez::*;
 use log::*;
 
@@ -17,23 +18,23 @@ impl std::fmt::Display for EventHandlerError {
     }
 }
 
-// // helpers
-// fn click_in_rect(x: f32, y: f32, rect: graphics::Rect) -> bool {
-//     x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h
-// }
+// helpers
+fn click_in_rect(x: f32, y: f32, rect: graphics::Rect) -> bool {
+    x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h
+}
 
-// fn convert_coord_to_sandbox_coord(
-//     settings: &settings::Settings,
-//     x: f32,
-//     y: f32,
-// ) -> SandboxCoordinate {
-//     // even though state.make_atom() checks invalid mutation, check here as well that we're not
-//     // getting underflows or anything silly
-//     SandboxCoordinate {
-//         x: (x - settings.frame_sandbox.x) as i32 / settings.get_scaling_factor(),
-//         y: (y - settings.frame_sandbox.y) as i32 / settings.get_scaling_factor(),
-//     }
-// }
+fn convert_coord_to_sandbox_coord(
+    renderer: &Renderer,
+    x: f32,
+    y: f32,
+) -> SandboxCoordinate {
+    // even though state.make_atom() checks invalid mutation, check here as well that we're not
+    // getting underflows or anything silly
+    SandboxCoordinate {
+        x: (x - renderer.get_frame_sandbox().x) as i32 / renderer.get_scaling_factor(),
+        y: (y - renderer.get_frame_sandbox().y) as i32 / renderer.get_scaling_factor(),
+    }
+}
 
 // handlers
 pub fn update(_ctx: &mut Context, _state: &mut State) -> Result<(), Error> {
@@ -44,6 +45,7 @@ pub fn update(_ctx: &mut Context, _state: &mut State) -> Result<(), Error> {
 pub fn mouse_button_down_event(
     _ctx: &mut Context,
     state: &mut State,
+    renderer: &Renderer,
     button: input::mouse::MouseButton,
     x: f32,
     y: f32,
@@ -51,23 +53,22 @@ pub fn mouse_button_down_event(
     match button {
         input::mouse::MouseButton::Left => {
             // handle LMB
-            debug!("NOT Handling LMB at ({}, {})", x, y);
-            // // TODO: probably need to make this a match to determine which box got clicked
-            // if click_in_rect(x, y, state.settings.frame_sandbox) {
-            //     // if clicked in sandbox
-            //     let coord = convert_coord_to_sandbox_coord(&state.settings, x, y);
-            //     info!("Making atom at ({}, {})", coord.x, coord.y);
-            //     state
-            //         .make_atom(coord, graphics::Color::WHITE)
-            //         .map_err(|err| info!("{}", err))
-            //         .ok();
-            //     Ok(())
-            // } else {
-            //     // if clicked outside of sandbox
-            //     debug!("EH: Atom out of bounds, not generating");
-            //     return Ok(());
-            // }
-            Ok(())
+            debug!("Handling LMB at ({}, {})", x, y);
+            // TODO: probably need to make this a match to determine which box got clicked
+            if click_in_rect(x, y, renderer.get_frame_sandbox()) {
+                // if clicked in sandbox
+                let coord = convert_coord_to_sandbox_coord(&renderer, x, y);
+                info!("Making atom at ({}, {})", coord.x, coord.y);
+                state
+                    .make_atom(coord, graphics::Color::WHITE)
+                    .map_err(|err| info!("{}", err))
+                    .ok();
+                Ok(())
+            } else {
+                // if clicked outside of sandbox
+                debug!("EH: Atom out of bounds, not generating");
+                return Ok(());
+            }
         }
         _ => Ok(()),
     }

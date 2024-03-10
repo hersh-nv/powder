@@ -14,8 +14,8 @@ impl std::fmt::Display for RendererError {
     }
 }
 pub struct Renderer {
-    pub frame_sandbox: Rect,
-    pub frame_fps: Rect,
+    frame_sandbox: Rect,
+    frame_fps: Rect,
     pub scaling_factor: i32,
 
     // TODO: use this to cache the sandbox mesh (and any other Drawables that don't need to be
@@ -76,7 +76,11 @@ impl Renderer {
     pub fn get_scaling_factor(&self) -> i32 {
         self.scaling_factor
     }
-    
+
+    pub fn get_frame_sandbox(&self) -> Rect {
+        self.frame_sandbox.clone()
+    }
+
     fn draw_fps(&self, ctx: &mut Context, frame: Rect, font: &Option<String>) -> GameResult<Text> {
         let mut text = Text::new(TextFragment {
             text: format!("{:.2}", ctx.time.fps()),

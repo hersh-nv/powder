@@ -58,6 +58,6 @@ impl ggez::event::EventHandler<GameError> for Powder {
         x: f32,
         y: f32,
     ) -> GameResult {
-        event_handles::mouse_button_down_event(ctx, &mut self.state, button, x, y)
+        event_handles::mouse_button_down_event(ctx, &mut self.state, &self.renderer, button, x, y)
     }
 }
