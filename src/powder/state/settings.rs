@@ -16,6 +16,7 @@ impl std::fmt::Display for SettingsError {
     }
 }
 
+#[derive(Clone)]
 pub struct Settings {
     pub sandbox_w: i32,
     pub sandbox_h: i32,
@@ -32,12 +33,13 @@ pub struct Settings {
 }
 
 impl Settings {
-    pub fn new(ctx: &mut Context) -> Self {
+    pub fn new() -> Self {
         const DEF_SANDBOX_W: i32 = 512;
         const DEF_SANDBOX_H: i32 = 512;
         const DEF_SCALING_FACTOR: i32 = 10;
 
-        let (win_width, win_height) = ctx.gfx.drawable_size();
+        // let (win_width, win_height) = ctx.gfx.drawable_size();
+        let (win_width, win_height) = (1000 as f32,1000 as f32);
         // align the sandbox to the grid scale
         let sandbox_w = DEF_SANDBOX_W - DEF_SANDBOX_W % DEF_SCALING_FACTOR;
         let sandbox_h = DEF_SANDBOX_H - DEF_SANDBOX_H % DEF_SCALING_FACTOR;

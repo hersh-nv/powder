@@ -17,7 +17,7 @@ pub struct Powder {
 impl Powder {
     pub fn new(ctx: &mut Context) -> GameResult<Self> {
         let mut powder = Powder {
-            state: State::new(ctx),
+            state: State::new(),
             assets: Assets::new(ctx)?,
         };
         powder.init(ctx)?;
