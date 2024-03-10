@@ -1,18 +1,15 @@
 use anyhow::Result;
-#[cfg(not(test))]
 use log::{debug, info};
 
-#[cfg(test)]
-use std::{println as debug, println as info};
-
 use thiserror::Error;
-use rand;
 
 use ggez::graphics::Color;
 use ggez::mint::Vector2;
 
 pub mod settings;
 use settings::*;
+mod atom;
+use atom::*;
 
 /* Module error */
 #[derive(Error, Debug)]
@@ -23,41 +20,6 @@ pub enum StateError {
 
 /* Subtypes and structs */
 pub type SandboxCoordinate = Vector2<i32>;
-
-#[derive(Copy, Clone, Debug)]
-pub struct Atom {
-    pub coord: SandboxCoordinate,
-    pub color: Color,
-    pub next_coord: SandboxCoordinate,
-}
-
-impl Atom {
-    pub fn new(coord: SandboxCoordinate, color: Color) -> Self {
-        Atom { coord: coord, color: color, next_coord: coord}
-    }
-    
-    pub fn set_next(&mut self, neighbourhood: Vec<bool>) {
-        // neighbourhood is a vec of surrounding coords in 1,2,3,4,6,7,8,9 order
-        // as on a keypad (as if the updating atom is at pos 5), where the
-        // element is true if that coord contains an atom and false if it
-        // doesn't
-        let (dx, dy) = match neighbourhood[..] {
-            [_, _, _, _, _, _, false, _] => (0, 1),
-            [_, _, _, _, _, false, true, true] => (-1, 1),
-            [_, _, _, _, _, true, true, false] => (1, 1),
-            [_, _, _, _, _, false, true, false] => (rand::random::<bool>() as i32 * 2 - 1, -1),
-            // yeah all the other coords are unused for now but could be useful later
-            _ => (0, 0),
-        };
-        self.next_coord.x = self.coord.x + dx;
-        self.next_coord.y = self.coord.y + dy;
-        debug!("{self:?}, {neighbourhood:?}");
-    }
-
-    pub fn update(&mut self) {
-        self.coord = self.next_coord;
-    }
-}
 
 pub type Atoms = Vec<Atom>;
 
@@ -184,12 +146,12 @@ mod tests {
     #[test]
     fn atom_collides_with_ground() {
         let mut state = State::new(5);
-        state.make_atom(SandboxCoordinate{ x: 3, y: 3}, Color::RED).ok();
-        state.update_atoms(); // should be at [3,4]
-        state.update_atoms(); // should be at [3,5]
-        state.update_atoms(); // should be at [3,5]
+        state.make_atom(SandboxCoordinate{ x: 2, y: 2}, Color::RED).ok();
+        state.update_atoms(); // should be at [2,3]
+        state.update_atoms(); // should be at [2,4]
+        state.update_atoms(); // should be at [2,4]
         if let Some(atom) = state.get_atoms().get(0) {
-            assert_eq!(atom.coord, SandboxCoordinate{x: 3, y: 5});
+            assert_eq!(atom.coord, SandboxCoordinate{x: 2, y: 4});
         }
     }
 }
