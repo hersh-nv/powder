@@ -6,19 +6,24 @@ mod event_handles;
 mod renderer;
 mod state;
 
+use renderer::Renderer;
 use assets::Assets;
 use state::State;
 
 pub struct Powder {
     state: state::State,
     assets: Assets,
+    renderer: Renderer,
 }
 
 impl Powder {
     pub fn new(ctx: &mut Context) -> GameResult<Self> {
+        let state = State::new();
+        let assets = Assets::new(ctx)?;
         let mut powder = Powder {
-            state: State::new(),
-            assets: Assets::new(ctx)?,
+            state: state,
+            assets: assets,
+            renderer: Renderer::new(ctx, &state),
         };
         powder.init(ctx)?;
         Ok(powder)
@@ -39,7 +44,7 @@ impl ggez::event::EventHandler<GameError> for Powder {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
-        renderer::draw(ctx, &self.state, &self.assets)?;
+        self.renderer.draw(ctx, &self.state, &self.assets)?;
         timer::yield_now();
         Ok(())
     }
