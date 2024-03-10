@@ -47,7 +47,7 @@ impl State {
     }
 
     fn atom_out_of_bounds(&self, coord: SandboxCoordinate) -> bool {
-        coord.x >= self.settings.sandbox_w || coord.y >= self.settings.sandbox_h
+        coord.x < 0 || coord.x >= self.settings.sandbox_w || coord.y < 0 || coord.y >= self.settings.sandbox_h
     }
 
     fn atom_collision(&self, coord: SandboxCoordinate) -> bool {
