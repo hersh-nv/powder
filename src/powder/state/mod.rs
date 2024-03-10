@@ -45,7 +45,7 @@ impl Atom {
             [_, _, _, _, _, _, false, _] => (0, 1),
             [_, _, _, _, _, false, true, true] => (-1, 1),
             [_, _, _, _, _, true, true, false] => (1, 1),
-            [_, _, _, _, _, false, true, false] => (rand::random::<bool>() as i32 * 1, -1),
+            [_, _, _, _, _, false, true, false] => (rand::random::<bool>() as i32 * 2 - 1, -1),
             // yeah all the other coords are unused for now but could be useful later
             _ => (0, 0),
         };
