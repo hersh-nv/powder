@@ -23,15 +23,14 @@ pub type SandboxCoordinate = Vector2<u16>;
 pub struct Atom {
     pub coord: SandboxCoordinate,
     pub color: Color,
-    pub vel: Vector2<u16>,
 }
 
 impl Atom {
-    pub fn change_pos(&mut self, d: Vector2<u16>) -> Result<(), StateError> {
-        self.coord.x = self.coord.x + d.x;
-        self.coord.y = self.coord.y + d.y;
-        Ok(())
-    }
+    // pub fn change_pos(&mut self, d: Vector2<u16>) -> Result<(), StateError> {
+    //     self.coord.x = self.coord.x + d.x;
+    //     self.coord.y = self.coord.y + d.y;
+    //     Ok(())
+    // }
 }
 
 pub type Atoms = Vec<Atom>;
@@ -93,7 +92,6 @@ impl State {
             self.atoms.push(Atom {
                 coord: coord,
                 color: color,
-                vel: Vector2 { x: 0, y: 0 },
             });
             Ok(())
         }
@@ -103,11 +101,4 @@ impl State {
         &self.atoms
     }
 
-    pub fn get_atoms_mut(&mut self) -> &mut Atoms {
-        &mut self.atoms
-    }
-
-    pub fn apply_field(&mut self) {
-        // TODO
-    }
 }
