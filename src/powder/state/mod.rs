@@ -86,8 +86,8 @@ impl State {
             .ok();
     }
 
-    fn atom_in_bounds(&self, coord: SandboxCoordinate) -> bool {
-        !(coord.x > self.settings.sandbox_w || coord.y > self.settings.sandbox_h)
+    fn atom_out_of_bounds(&self, coord: SandboxCoordinate) -> bool {
+        coord.x > self.settings.sandbox_w || coord.y > self.settings.sandbox_h
     }
 
     fn atom_collision(&self, coord: SandboxCoordinate) -> bool {
@@ -106,7 +106,7 @@ impl State {
     }
 
     pub fn make_atom(&mut self, coord: SandboxCoordinate, color: Color) -> Result<(), StateError> {
-        if !self.atom_in_bounds(coord) {
+        if self.atom_out_of_bounds(coord) {
             Err(StateError::AtomError(String::from("Atom out of bounds")))
         } else if self.atom_collision(coord) {
             Err(StateError::AtomError(String::from(
@@ -130,7 +130,7 @@ impl State {
                     continue;
                 }
                 let target = SandboxCoordinate { x: atom.coord.x + dx, y: atom.coord.y + dy};
-                if self.atom_collision(target) || !self.atom_in_bounds(target) {
+                if self.atom_collision(target) || self.atom_out_of_bounds(target) {
                     neighbourhood.push(true);
                 } else {
                     neighbourhood.push(false);
