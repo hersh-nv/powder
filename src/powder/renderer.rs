@@ -107,7 +107,7 @@ impl Renderer {
                     w: scaling_factor as f32,
                     h: scaling_factor as f32,
                 },
-                atom.color,
+                atom.color(),
             )
             .expect("Couldn't draw atom");
         }

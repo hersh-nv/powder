@@ -2,14 +2,14 @@ use anyhow::Result;
 use log::{debug, info};
 
 use thiserror::Error;
-
-use ggez::graphics::Color;
 use ggez::mint::Vector2;
 
 pub mod settings;
 use settings::*;
-mod atom;
+pub mod atom;
 use atom::*;
+
+pub type SandboxCoordinate = Vector2<i32>;
 
 /* Module error */
 #[derive(Error, Debug)]
@@ -19,8 +19,6 @@ pub enum StateError {
 }
 
 /* Subtypes and structs */
-pub type SandboxCoordinate = Vector2<i32>;
-
 pub type Atoms = Vec<Atom>;
 
 /* State */
@@ -40,11 +38,11 @@ impl State {
 
     pub fn init(&mut self) {
         // stub init: make some test atoms
-        self.make_atom(SandboxCoordinate { x: 0, y: 0 }, Color::RED)
+        self.make_atom(SandboxCoordinate { x: 0, y: 0 }, Element::Sand)
             .ok();
-        self.make_atom(SandboxCoordinate { x: 10, y: 10 }, Color::BLUE)
+        self.make_atom(SandboxCoordinate { x: 10, y: 10 }, Element::Sand)
             .ok();
-        self.make_atom(SandboxCoordinate { x: 20, y: 20 }, Color::GREEN)
+        self.make_atom(SandboxCoordinate { x: 20, y: 20 }, Element::Sand)
             .ok();
     }
 
@@ -67,7 +65,7 @@ impl State {
         false
     }
 
-    pub fn make_atom(&mut self, coord: SandboxCoordinate, color: Color) -> Result<(), StateError> {
+    pub fn make_atom(&mut self, coord: SandboxCoordinate, element: Element) -> Result<(), StateError> {
         if self.atom_out_of_bounds(coord) {
             Err(StateError::AtomError(String::from("Atom out of bounds")))
         } else if self.atom_collision(coord) {
@@ -75,7 +73,7 @@ impl State {
                 "Atom already exists here",
             )))
         } else {
-            self.atoms.push(Atom::new(coord, color));
+            self.atoms.push(Atom::new(coord, element));
             Ok(())
         }
     }
@@ -124,8 +122,8 @@ mod tests {
     fn make_and_update_three_atoms() {
         // init with two atoms
         let mut state = State::new(10);
-        state.make_atom(SandboxCoordinate {x: 3, y: 3}, Color::RED).ok();
-        state.make_atom(SandboxCoordinate {x: 4, y: 4}, Color::BLUE).ok();
+        state.make_atom(SandboxCoordinate {x: 3, y: 3}, Element::Sand).ok();
+        state.make_atom(SandboxCoordinate {x: 4, y: 4}, Element::Sand).ok();
         // these two should fall straight down
         state.update_atoms();
         if let Some(atom) = state.get_atoms().get(0) {
@@ -135,7 +133,7 @@ mod tests {
             assert_eq!(atom.coord, SandboxCoordinate{x: 4, y: 5});                
         }
         // add a third atom under the top one
-        state.make_atom(SandboxCoordinate {x: 3, y: 5}, Color::GREEN).ok();
+        state.make_atom(SandboxCoordinate {x: 3, y: 5}, Element::Sand).ok();
         // top one should now fall down to the left
         state.update_atoms();
         if let Some(atom) = state.get_atoms().get(0) {
@@ -146,7 +144,7 @@ mod tests {
     #[test]
     fn atom_collides_with_ground() {
         let mut state = State::new(5);
-        state.make_atom(SandboxCoordinate{ x: 2, y: 2}, Color::RED).ok();
+        state.make_atom(SandboxCoordinate{ x: 2, y: 2}, Element::Sand).ok();
         state.update_atoms(); // should be at [2,3]
         state.update_atoms(); // should be at [2,4]
         state.update_atoms(); // should be at [2,4]
