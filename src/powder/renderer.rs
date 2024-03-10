@@ -108,7 +108,7 @@ impl Renderer {
         Ok(Mesh::from_data(ctx, MeshBuilder::new()
             .rectangle(
                 DrawMode::stroke(1f32),
-                Rect::new(0f32, 0f32, sandbox.w, sandbox.h),
+                Rect::new(0f32, 0f32, sandbox.w + 1.0, sandbox.h + 1.0),
                 Color::WHITE,
             )?
             .build()))
