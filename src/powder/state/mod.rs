@@ -10,7 +10,6 @@ use rand;
 
 use ggez::graphics::Color;
 use ggez::mint::Vector2;
-use ggez::Context;
 
 pub mod settings;
 use settings::*;
@@ -71,9 +70,9 @@ pub struct State {
 }
 
 impl State {
-    pub fn new() -> Self {
+    pub fn new(sandbox_size: i32) -> Self {
         State {
-            settings: Settings::new(),
+            settings: Settings::new(sandbox_size),
             atoms: vec![],
         }
     }
@@ -93,7 +92,6 @@ impl State {
     }
 
     fn atom_collision(&self, coord: SandboxCoordinate) -> bool {
-        // TODO: optimise
         for atom in &self.atoms {
             if coord.x != atom.coord.x {
                 continue;
@@ -132,7 +130,8 @@ impl State {
                 if dx == 0 && dy == 0 {
                     continue;
                 }
-                if self.atom_collision(SandboxCoordinate { x: atom.coord.x + dx, y: atom.coord.y + dy}) {
+                let target = SandboxCoordinate { x: atom.coord.x + dx, y: atom.coord.y + dy};
+                if self.atom_collision(target) || !self.atom_in_bounds(target) {
                     neighbourhood.push(true);
                 } else {
                     neighbourhood.push(false);
@@ -165,7 +164,7 @@ mod tests {
     #[test]
     fn make_and_update_three_atoms() {
         // init with two atoms
-        let mut state = State::new();
+        let mut state = State::new(10);
         state.make_atom(SandboxCoordinate {x: 3, y: 3}, Color::RED).ok();
         state.make_atom(SandboxCoordinate {x: 4, y: 4}, Color::BLUE).ok();
         // these two should fall straight down
@@ -183,5 +182,17 @@ mod tests {
         if let Some(atom) = state.get_atoms().get(0) {
             assert_eq!(atom.coord, SandboxCoordinate{x: 2, y: 5});
         }
-    } 
+    }
+
+    #[test]
+    fn atom_collides_with_ground() {
+        let mut state = State::new(5);
+        state.make_atom(SandboxCoordinate{ x: 3, y: 3}, Color::RED).ok();
+        state.update_atoms().ok(); // should be at [3,4]
+        state.update_atoms().ok(); // should be at [3,5]
+        state.update_atoms().ok(); // should be at [3,5]
+        if let Some(atom) = state.get_atoms().get(0) {
+            assert_eq!(atom.coord, SandboxCoordinate{x: 3, y: 5});
+        }
+    }
 }

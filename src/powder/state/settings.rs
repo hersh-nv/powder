@@ -23,9 +23,9 @@ pub struct Settings {
 }
 
 impl Settings {
-    pub fn new() -> Self {
-        let sandbox_w = 50;
-        let sandbox_h = 50;
+    pub fn new(sandbox_size: i32) -> Self {
+        let sandbox_w = sandbox_size;
+        let sandbox_h = sandbox_size;
         // for now things are gonna break in the renderer if this isn't square
         // so let's just mandate that for now
         assert_eq!(sandbox_w, sandbox_h);

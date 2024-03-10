@@ -18,7 +18,7 @@ pub struct Powder {
 
 impl Powder {
     pub fn new(ctx: &mut Context) -> GameResult<Self> {
-        let state = State::new();
+        let state = State::new(50); // hardcode sandbox size for now
         let assets = Assets::new(ctx)?;
         let renderer = Renderer::new(ctx, &state);
         let mut powder = Powder {
