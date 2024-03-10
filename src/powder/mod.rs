@@ -20,10 +20,11 @@ impl Powder {
     pub fn new(ctx: &mut Context) -> GameResult<Self> {
         let state = State::new();
         let assets = Assets::new(ctx)?;
+        let renderer = Renderer::new(ctx, &state);
         let mut powder = Powder {
             state: state,
             assets: assets,
-            renderer: Renderer::new(ctx, &state),
+            renderer: renderer,
         };
         powder.init(ctx)?;
         Ok(powder)
