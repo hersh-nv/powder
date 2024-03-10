@@ -17,7 +17,7 @@ fn draw_fps(ctx: &mut Context, frame: Rect, font: &Option<String>) -> GameResult
     Ok(text)
 }
 
-fn draw_atoms(ctx: &mut Context, atoms: &Atoms, scaling_factor: u16) -> GameResult<Mesh> {
+fn draw_atoms(ctx: &mut Context, atoms: &Atoms, scaling_factor: i32) -> GameResult<Mesh> {
     // TODO: proper co-ordinate conversion
     let mb = &mut MeshBuilder::new();
     for atom in atoms {
@@ -56,7 +56,7 @@ pub fn draw(ctx: &mut Context, state: &State, assets: &Assets) -> GameResult {
     let atoms_m = draw_atoms(
         ctx,
         state.get_atoms(),
-        state.settings.get_scaling_factor() as u16,
+        state.settings.get_scaling_factor() as i32,
     )?;
     let text = draw_fps(ctx, state.settings.frame_fps, &assets.font)?;
     canvas.draw(

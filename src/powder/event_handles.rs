@@ -30,8 +30,8 @@ fn convert_coord_to_sandbox_coord(
     // even though state.make_atom() checks invalid mutation, check here as well that we're not
     // getting underflows or anything silly
     SandboxCoordinate {
-        x: (x - settings.frame_sandbox.x) as u16 / settings.get_scaling_factor() as u16,
-        y: (y - settings.frame_sandbox.y) as u16 / settings.get_scaling_factor() as u16,
+        x: (x - settings.frame_sandbox.x) as i32 / settings.get_scaling_factor(),
+        y: (y - settings.frame_sandbox.y) as i32 / settings.get_scaling_factor(),
     }
 }
 

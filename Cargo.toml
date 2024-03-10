@@ -12,3 +12,4 @@ anyhow = "1.0.42"
 thiserror = "1.0.26"
 ggez = "0.9.3"
 glam = { version = "0.24.1", features = ["mint"] }
+rand = "0.8.5"

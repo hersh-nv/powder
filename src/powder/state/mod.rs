@@ -1,6 +1,7 @@
 use anyhow::Result;
 use log::error;
 use thiserror::Error;
+use rand;
 
 use ggez::graphics::Color;
 use ggez::mint::Vector2;
@@ -17,7 +18,7 @@ pub enum StateError {
 }
 
 /* Subtypes and structs */
-pub type SandboxCoordinate = Vector2<u16>;
+pub type SandboxCoordinate = Vector2<i32>;
 
 #[derive(Copy, Clone)]
 pub struct Atom {
@@ -26,16 +27,24 @@ pub struct Atom {
 }
 
 impl Atom {
-    // pub fn change_pos(&mut self, d: Vector2<u16>) -> Result<(), StateError> {
-    //     self.coord.x = self.coord.x + d.x;
-    //     self.coord.y = self.coord.y + d.y;
-    //     Ok(())
-    // }
+    pub fn update(&mut self, neighbourhood: Vec<bool>) -> Result<(), StateError> {
+        // neighbourhood is a vec of surrounding coords in 1,2,3,4,6,7,8,9 order
+        // as on a keypad (as if the updating atom is at pos 5), where the
+        // element is true if that coord contains an atom and false if it
+        // doesn't
+        let (dx, dy) = match neighbourhood[..] {
+            [_, _, _, _, _, _, false, _] => (0, -1),
+            [_, _, _, _, _, false, true, true] => (-1, -1),
+            [_, _, _, _, _, true, true, false] => (1, -1),
+            [_, _, _, _, _, false, true, false] => (rand::random::<bool>() as i32 * 1, -1),
+            // yeah all the other coords are unused for now but could be useful later
+            _ => (0, 0),
+        };
+        Ok(())
+    }
 }
 
 pub type Atoms = Vec<Atom>;
-
-// pub type Field = [Vector2; ]
 
 /* State */
 pub struct State {
@@ -101,4 +110,21 @@ impl State {
         &self.atoms
     }
 
+    fn get_atom_neighbourhood(&mut self, atom: Atom) -> Vec<bool> {
+        let mut neighbourhood: Vec<bool> = vec![];
+        for dx in -1..1 {
+            for dy in -1..1 {
+                if dx == 0 && dy == 0 {
+                    continue;
+                }
+                if self.atom_collision(SandboxCoordinate { x: atom.coord.x + dx, y: atom.coord.y + dy}) {
+                    neighbourhood.push(true);
+                } else {
+                    neighbourhood.push(false);
+                }
+            }
+        }
+        assert!(neighbourhood.len() == 8);
+        neighbourhood
+    }
 }
