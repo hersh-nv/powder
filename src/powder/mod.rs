@@ -6,8 +6,8 @@ mod event_handles;
 mod renderer;
 mod state;
 
-use renderer::Renderer;
 use assets::Assets;
+use renderer::Renderer;
 use state::State;
 
 pub struct Powder {
@@ -41,6 +41,16 @@ impl ggez::event::EventHandler<GameError> for Powder {
     /* Required methods for EventHandler trait */
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         event_handles::update(ctx, &mut self.state).ok();
+        if ctx.mouse.button_pressed(input::mouse::MouseButton::Left) {
+            event_handles::mouse_button_down_event(
+                ctx,
+                &mut self.state,
+                &self.renderer,
+                input::mouse::MouseButton::Left,
+                ctx.mouse.position().x,
+                ctx.mouse.position().y,
+            )?
+        }
         self.state.update_atoms();
         Ok(())
     }
@@ -59,6 +69,7 @@ impl ggez::event::EventHandler<GameError> for Powder {
         x: f32,
         y: f32,
     ) -> GameResult {
-        event_handles::mouse_button_down_event(ctx, &mut self.state, &self.renderer, button, x, y)
+        // event_handles::mouse_button_down_event(ctx, &mut self.state, &self.renderer, button, x, y)
+        Ok(())
     }
 }
