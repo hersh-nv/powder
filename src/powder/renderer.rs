@@ -20,7 +20,7 @@ pub struct Renderer {
 
     // TODO: use this to cache the sandbox mesh (and any other Drawables that don't need to be
     // regenerated every frame)
-    pub mesh_sandbox: Option<Mesh>,
+    // pub mesh_sandbox: Option<Mesh>,
 }
 
 impl Renderer {
@@ -37,15 +37,6 @@ impl Renderer {
         let sandbox_size_px = sandbox_size_px - sandbox_size_px % state.settings.sandbox_w;
         // calc scaling factor based on this -- do we still need it?
         let scaling_factor = sandbox_size_px / state.settings.sandbox_w;
-
-        // let frame_w: i32 = (win_w * 0.8) as i32;
-        // let frame_w = frame_w - frame_w % state.settings.sandbox_w;
-        // let frame_h = (win_h * 0.8) as i32;
-        // let frame_h = frame_h - frame_h % state.settings.sandbox_h;
-
-        // align the sandbox to the grid scale
-        // let sandbox_w = DEF_SANDBOX_W - DEF_SANDBOX_W % state.settings.scaling_factor;
-        // let sandbox_h = DEF_SANDBOX_H - DEF_SANDBOX_H % state.settings.scaling_factor;
 
         // calc sandbox frame
         let frame_sandbox = Rect::new(
@@ -69,7 +60,6 @@ impl Renderer {
             frame_sandbox: frame_sandbox,
             frame_fps: frame_fps,
             scaling_factor: scaling_factor,
-            mesh_sandbox: None,
         }
     }
 
