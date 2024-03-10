@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use thiserror::Error;
 use ggez::mint::Vector2;
+use thiserror::Error;
 
 pub mod settings;
 use settings::*;
@@ -46,7 +46,10 @@ impl State {
     }
 
     fn atom_out_of_bounds(&self, coord: SandboxCoordinate) -> bool {
-        coord.x < 0 || coord.x >= self.settings.sandbox_w || coord.y < 0 || coord.y >= self.settings.sandbox_h
+        coord.x < 0
+            || coord.x >= self.settings.sandbox_w
+            || coord.y < 0
+            || coord.y >= self.settings.sandbox_h
     }
 
     fn atom_collision(&self, coord: SandboxCoordinate) -> bool {
@@ -64,7 +67,11 @@ impl State {
         false
     }
 
-    pub fn make_atom(&mut self, coord: SandboxCoordinate, element: Element) -> Result<(), StateError> {
+    pub fn make_atom(
+        &mut self,
+        coord: SandboxCoordinate,
+        element: Element,
+    ) -> Result<(), StateError> {
         if self.atom_out_of_bounds(coord) {
             Err(StateError::AtomError(String::from("Atom out of bounds")))
         } else if self.atom_collision(coord) {
@@ -88,7 +95,10 @@ impl State {
                 if dx == 0 && dy == 0 {
                     continue;
                 }
-                let target = SandboxCoordinate { x: atom.coord.x + dx, y: atom.coord.y + dy};
+                let target = SandboxCoordinate {
+                    x: atom.coord.x + dx,
+                    y: atom.coord.y + dy,
+                };
                 if self.atom_collision(target) || self.atom_out_of_bounds(target) {
                     neighbourhood.push(true);
                 } else {
@@ -105,12 +115,15 @@ impl State {
         let self_copy = self.clone();
         for atom in &mut self.atoms {
             let nh = self_copy.get_atom_neighbourhood(atom);
-            atom.set_next(nh);
+            // optim: if neighbourhood is obviously full dont bother doing anything
+            if nh[3..7] != [true, true, true, true, true] {
+                atom.set_next(nh);
+            }
         }
         for atom in &mut self.atoms {
             atom.update();
         }
-    }    
+    }
 }
 
 #[cfg(test)]
@@ -121,34 +134,42 @@ mod tests {
     fn make_and_update_three_atoms() {
         // init with two atoms
         let mut state = State::new(10);
-        state.make_atom(SandboxCoordinate {x: 3, y: 3}, Element::Sand).ok();
-        state.make_atom(SandboxCoordinate {x: 4, y: 4}, Element::Sand).ok();
+        state
+            .make_atom(SandboxCoordinate { x: 3, y: 3 }, Element::Sand)
+            .ok();
+        state
+            .make_atom(SandboxCoordinate { x: 4, y: 4 }, Element::Sand)
+            .ok();
         // these two should fall straight down
         state.update_atoms();
         if let Some(atom) = state.get_atoms().get(0) {
-            assert_eq!(atom.coord, SandboxCoordinate{x: 3, y: 4});
+            assert_eq!(atom.coord, SandboxCoordinate { x: 3, y: 4 });
         }
         if let Some(atom) = state.get_atoms().get(1) {
-            assert_eq!(atom.coord, SandboxCoordinate{x: 4, y: 5});                
+            assert_eq!(atom.coord, SandboxCoordinate { x: 4, y: 5 });
         }
         // add a third atom under the top one
-        state.make_atom(SandboxCoordinate {x: 3, y: 5}, Element::Sand).ok();
+        state
+            .make_atom(SandboxCoordinate { x: 3, y: 5 }, Element::Sand)
+            .ok();
         // top one should now fall down to the left
         state.update_atoms();
         if let Some(atom) = state.get_atoms().get(0) {
-            assert_eq!(atom.coord, SandboxCoordinate{x: 2, y: 5});
+            assert_eq!(atom.coord, SandboxCoordinate { x: 2, y: 5 });
         }
     }
 
     #[test]
     fn atom_collides_with_ground() {
         let mut state = State::new(5);
-        state.make_atom(SandboxCoordinate{ x: 2, y: 2}, Element::Sand).ok();
+        state
+            .make_atom(SandboxCoordinate { x: 2, y: 2 }, Element::Sand)
+            .ok();
         state.update_atoms(); // should be at [2,3]
         state.update_atoms(); // should be at [2,4]
         state.update_atoms(); // should be at [2,4]
         if let Some(atom) = state.get_atoms().get(0) {
-            assert_eq!(atom.coord, SandboxCoordinate{x: 2, y: 4});
+            assert_eq!(atom.coord, SandboxCoordinate { x: 2, y: 4 });
         }
     }
 }
