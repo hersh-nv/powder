@@ -1,5 +1,4 @@
 use anyhow::Result;
-use log::{debug, info};
 
 use thiserror::Error;
 use ggez::mint::Vector2;

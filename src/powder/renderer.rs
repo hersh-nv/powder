@@ -28,7 +28,7 @@ impl Renderer {
         // figure that the sandbox should take 80% of the smaller screen dimension?
         // and assuming square for now
         let (win_w, win_h) = ctx.gfx.drawable_size();
-        let mut sandbox_size_px;
+        let sandbox_size_px;
         if win_w > win_h {
             sandbox_size_px = (win_h * 0.8) as i32;
         } else {
@@ -60,16 +60,6 @@ impl Renderer {
             frame_sandbox: frame_sandbox,
             frame_fps: frame_fps,
             scaling_factor: scaling_factor,
-        }
-    }
-
-    pub fn set_scaling_factor(&mut self, sf: i32) -> Result<(), RendererError> {
-        match sf {
-            1..=10 => {
-                self.scaling_factor = sf;
-                Ok(())
-            }
-            _ => Err(RendererError),
         }
     }
 

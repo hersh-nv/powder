@@ -1,12 +1,3 @@
-/*
-Store state info that is mutable, but will not be as frequently mutated as object state data.
-Cache whatever data here you like.
-This includes layout data.
-*/
-
-use ggez::graphics::Rect;
-use ggez::*;
-
 #[derive(Debug)]
 pub struct SettingsError;
 

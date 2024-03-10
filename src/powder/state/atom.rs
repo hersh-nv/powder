@@ -1,6 +1,5 @@
-use log::{debug, info};
+use log::debug;
 
-use ggez::mint::Vector2;
 use ggez::graphics::Color;
 
 use super::SandboxCoordinate;
