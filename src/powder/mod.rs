@@ -41,6 +41,7 @@ impl ggez::event::EventHandler<GameError> for Powder {
     /* Required methods for EventHandler trait */
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         event_handles::update(ctx, &mut self.state).ok();
+        self.state.update_atoms();
         Ok(())
     }
 
