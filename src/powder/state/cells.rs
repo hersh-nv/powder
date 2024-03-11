@@ -12,16 +12,16 @@ pub enum CellsError {
 }
 
 #[derive(Clone)]
-pub struct Cells<'a> {
+pub struct Cells {
     size: (i32, i32),
-    array: Vec<Option<&'a Atom>>,
+    array: Vec<Option<Atom>>,
 }
 
 // Cells keeps a vector of every cell in the drawable space, starting from
 // (0,0)..(max_width,0) then continuing on to (0,1)..(max_width,1), all the way
 // up to (max_width,max_height), so the overall array is max_width * max_height
 // * cellsize in memory.
-impl<'a> Cells<'a> {
+impl Cells {
     pub fn new(sandbox_size: i32) -> Self {
         Cells {
             size: (sandbox_size, sandbox_size),
@@ -29,14 +29,14 @@ impl<'a> Cells<'a> {
         }
     }
 
-    pub fn fill_cell(&mut self, atom: &Atom) -> Result<()> {
-        if let None = self.get_cell_contents(atom.coord) {
+    pub fn fill_cell(&mut self, atom: Atom, coord: SandboxCoordinate) -> Result<()> {
+        if let None = self.get_cell_contents(coord) {
             Err(CellsError::CouldNotFillCell {
-                x: atom.coord.x,
-                y: atom.coord.y,
+                x: coord.x,
+                y: coord.y,
             }.into())
         } else {
-            self.array[(atom.coord.y * self.size.0 + atom.coord.x) as usize] = Some(atom);
+            self.array[(coord.y * self.size.0 + coord.x) as usize] = Some(atom);
             Ok(())
         }
     }
@@ -44,7 +44,7 @@ impl<'a> Cells<'a> {
     pub fn clear_cell(&mut self, coord: SandboxCoordinate) {
         self.array[(coord.y * self.size.0 + coord.x) as usize] = None;
     }
-    pub fn get_cell_contents(&self, coord: SandboxCoordinate) -> Option<&Atom> {
+    pub fn get_cell_contents(&self, coord: SandboxCoordinate) -> Option<Atom> {
         self.array[(coord.y * self.size.0 + coord.x) as usize]
     }
 
