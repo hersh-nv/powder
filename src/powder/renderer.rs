@@ -194,7 +194,8 @@ impl Renderer {
         // all drawing steps here
         let sandbox_m = self.draw_sandbox(ctx, self.frame_sandbox)?;
         let atoms_m = self.draw_atoms(ctx, state.get_atoms(), self.get_scaling_factor() as i32)?;
-        let text = self.draw_fps(ctx, self.frame_fps, &assets.font)?;
+        let fps = self.draw_fps(ctx, self.frame_fps, &assets.font)?;
+        // let button_water =
         canvas.draw(
             &sandbox_m,
             DrawParam::default().dest(Point2::new(self.frame_sandbox.x, self.frame_sandbox.y)),
@@ -204,7 +205,7 @@ impl Renderer {
             DrawParam::default().dest(Point2::new(self.frame_sandbox.x, self.frame_sandbox.y)),
         );
         canvas.draw(
-            &text,
+            &fps,
             DrawParam::default().dest(Point2::new(self.frame_fps.x, self.frame_fps.y)),
         );
         // output drawing
