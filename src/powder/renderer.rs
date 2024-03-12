@@ -61,7 +61,7 @@ impl Renderer {
         let frame_element_selector = Rect::new(
             frame_sandbox.x + frame_sandbox.w + 10f32,
             frame_sandbox.y,
-            100f32,
+            80f32,
             frame_sandbox.h,
         );
 
@@ -133,12 +133,12 @@ impl Renderer {
             text: text_str,
             color: Some(Color::WHITE),
             font: font.clone(),
-            scale: Some(PxScale::from(10f32)),
+            scale: Some(PxScale::from(button.h - 5f32)),
         });
-        text.set_bounds(Point2::new(button.x, button.y));
+        text.set_bounds(Point2::new(button.w, button.h));
         text.set_layout(TextLayout {
             h_align: TextAlign::Begin,
-            v_align: TextAlign::Middle,
+            v_align: TextAlign::Begin,
         });
 
         return (outline, text);
@@ -147,17 +147,17 @@ impl Renderer {
     fn draw_element_selector(&self, ctx: &mut Context, font: &Option<String>) -> Buttons {
         let mut element_selector: Vec<(Mesh, Text)> = vec![];
         // can't enumerate an enum so gotta keep an index separately
-        let i = 0f32;
+        let mut i = 0f32;
         for el in Element::iter() {
-            let button_height = 20f32;
+            let button_height = 30f32;
             let outline_rect = Rect {
-                x: self.frame_element_selector.x,
-                y: self.frame_element_selector.y + self.frame_element_selector.h
-                    - i * (button_height + 10f32),
+                x: 0f32,
+                y: self.frame_element_selector.h - i * (button_height + 10f32),
                 w: self.frame_element_selector.w,
                 h: button_height,
             };
             element_selector.push(self.draw_button(ctx, outline_rect, el.to_string(), font));
+            i += 1f32;
         }
         return element_selector;
     }
@@ -195,7 +195,7 @@ impl Renderer {
         let sandbox_m = self.draw_sandbox(ctx, self.frame_sandbox)?;
         let atoms_m = self.draw_atoms(ctx, state.get_atoms(), self.get_scaling_factor() as i32)?;
         let fps = self.draw_fps(ctx, self.frame_fps, &assets.font)?;
-        // let button_water =
+        let element_sel_m = self.draw_element_selector(ctx, &assets.font);
         canvas.draw(
             &sandbox_m,
             DrawParam::default().dest(Point2::new(self.frame_sandbox.x, self.frame_sandbox.y)),
@@ -208,6 +208,22 @@ impl Renderer {
             &fps,
             DrawParam::default().dest(Point2::new(self.frame_fps.x, self.frame_fps.y)),
         );
+        for button in element_sel_m.iter() {
+            canvas.draw(
+                &button.0,
+                DrawParam::default().dest(Point2::new(
+                    self.frame_element_selector.x,
+                    self.frame_element_selector.y,
+                )),
+            );
+            canvas.draw(
+                &button.1,
+                DrawParam::default().dest(Point2::new(
+                    self.frame_element_selector.x,
+                    self.frame_element_selector.y,
+                )),
+            );
+        }
         // output drawing
         canvas.finish(ctx)?;
         Ok(())
