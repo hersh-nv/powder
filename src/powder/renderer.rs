@@ -7,7 +7,12 @@ use strum::IntoEnumIterator;
 
 type Point2 = glam::Vec2;
 
-type Button = (Mesh, Text);
+#[derive(Debug, Clone)]
+struct Button {
+    frame: Mesh,
+    text: Text,
+    rect: Rect,
+}
 type Buttons = Vec<Button>;
 
 #[derive(Debug)]
@@ -43,10 +48,10 @@ impl Renderer {
 
         // calc sandbox frame
         let frame_sandbox = Rect::new(
-            (win_w - sandbox_size_px as f32) / 2.0,
-            (win_h - sandbox_size_px as f32) / 2.0,
-            sandbox_size_px as f32,
-            sandbox_size_px as f32,
+            (win_w - sandbox_size_px as f32) / 2f32,
+            (win_h - sandbox_size_px as f32) / 2f32,
+            sandbox_size_px as f32 + 1f32,
+            sandbox_size_px as f32 + 1f32,
         );
 
         // calc fps frame
@@ -113,7 +118,7 @@ impl Renderer {
             MeshBuilder::new()
                 .rectangle(
                     DrawMode::stroke(1f32),
-                    Rect::new(0f32, 0f32, sandbox.w + 1.0, sandbox.h + 1.0),
+                    Rect::new(0f32, 0f32, sandbox.w, sandbox.h),
                     Color::WHITE,
                 )
                 .expect("Couldn't draw sandbox mesh")
@@ -128,7 +133,7 @@ impl Renderer {
             MeshBuilder::new()
                 .rectangle(
                     DrawMode::stroke(1f32),
-                    Rect::new(0f32, 0f32, button.w + 1f32, button.h + 1f32),
+                    Rect::new(0f32, 0f32, button.w, button.h),
                     Color::WHITE,
                 )
                 .expect("Couldn't draw button")
@@ -139,30 +144,38 @@ impl Renderer {
             text: text_str,
             color: Some(Color::WHITE),
             font: self.font.clone(),
-            scale: Some(PxScale::from(button.h - 5f32)),
+            scale: Some(PxScale::from(button.h - 14f32)),
         });
         text.set_bounds(Point2::new(button.w, button.h));
         text.set_layout(TextLayout {
             h_align: TextAlign::Begin,
             v_align: TextAlign::Begin,
         });
-
-        return (outline, text);
+        Button {
+            frame: outline,
+            text: text,
+            rect: button,
+        }
     }
 
     fn draw_element_selector(&self, ctx: &mut Context) -> Buttons {
-        let mut element_selector: Vec<(Mesh, Text)> = vec![];
+        let mut element_selector: Buttons = vec![];
         // can't enumerate an enum so gotta keep an index separately
-        let mut i = 0f32;
+        let mut i = 1f32;
         for el in Element::iter() {
+            // create button drawables first
             let button_height = 30f32;
             let outline_rect = Rect {
-                x: 0f32,
-                y: self.frame_element_selector.h - i * (button_height + 10f32),
+                x: self.frame_element_selector.x,
+                y: self.frame_element_selector.y + self.frame_element_selector.h // offset to bottom of selector...
+                    - button_height * i // ... account for button height
+                    - 10f32 * (i - 1f32), // ... and padding
                 w: self.frame_element_selector.w,
                 h: button_height,
             };
-            element_selector.push(self.draw_button(ctx, outline_rect, el.to_string()));
+            let button = self.draw_button(ctx, outline_rect, el.to_string());
+            // then add to buttons vec
+            element_selector.push(button);
             i += 1f32;
         }
         return element_selector;
@@ -215,18 +228,12 @@ impl Renderer {
         );
         for button in self.mesh_buttons.clone().unwrap().iter() {
             canvas.draw(
-                &button.0,
-                DrawParam::default().dest(Point2::new(
-                    self.frame_element_selector.x,
-                    self.frame_element_selector.y,
-                )),
+                &button.frame,
+                DrawParam::default().dest(Point2::new(button.rect.x, button.rect.y)),
             );
             canvas.draw(
-                &button.1,
-                DrawParam::default().dest(Point2::new(
-                    self.frame_element_selector.x,
-                    self.frame_element_selector.y,
-                )),
+                &button.text,
+                DrawParam::default().dest(Point2::new(button.rect.x + 7f32, button.rect.y + 7f32)),
             );
         }
         // output drawing
