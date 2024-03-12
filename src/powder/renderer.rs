@@ -81,7 +81,7 @@ impl Renderer {
     pub fn init(&mut self, ctx: &mut Context) {
         // some drawables don't have to be redrawn every time, so are saved in the renderer at init
         self.mesh_sandbox = Some(self.draw_sandbox(ctx, self.frame_sandbox));
-        self.mesh_buttons = Some(self.draw_element_selector(ctx, &self.font));
+        self.mesh_buttons = Some(self.draw_element_selector(ctx));
     }
 
     pub fn get_scaling_factor(&self) -> i32 {
@@ -121,13 +121,7 @@ impl Renderer {
         )
     }
 
-    fn draw_button(
-        &self,
-        ctx: &mut Context,
-        button: Rect,
-        text_str: String,
-        font: &Option<String>,
-    ) -> Button {
+    fn draw_button(&self, ctx: &mut Context, button: Rect, text_str: String) -> Button {
         // button outline
         let outline = Mesh::from_data(
             ctx,
@@ -144,7 +138,7 @@ impl Renderer {
         let mut text = Text::new(TextFragment {
             text: text_str,
             color: Some(Color::WHITE),
-            font: font.clone(),
+            font: self.font.clone(),
             scale: Some(PxScale::from(button.h - 5f32)),
         });
         text.set_bounds(Point2::new(button.w, button.h));
@@ -156,7 +150,7 @@ impl Renderer {
         return (outline, text);
     }
 
-    fn draw_element_selector(&self, ctx: &mut Context, font: &Option<String>) -> Buttons {
+    fn draw_element_selector(&self, ctx: &mut Context) -> Buttons {
         let mut element_selector: Vec<(Mesh, Text)> = vec![];
         // can't enumerate an enum so gotta keep an index separately
         let mut i = 0f32;
@@ -168,7 +162,7 @@ impl Renderer {
                 w: self.frame_element_selector.w,
                 h: button_height,
             };
-            element_selector.push(self.draw_button(ctx, outline_rect, el.to_string(), font));
+            element_selector.push(self.draw_button(ctx, outline_rect, el.to_string()));
             i += 1f32;
         }
         return element_selector;
