@@ -43,6 +43,10 @@ impl State {
 
     pub fn init(&mut self) {}
 
+    pub fn set_active_element(&mut self, el: Element) {
+        self.active_element = el;
+    }
+
     fn atom_out_of_bounds(&self, coord: SandboxCoordinate) -> bool {
         coord.x < 0
             || coord.x >= self.parameters.sandbox_w

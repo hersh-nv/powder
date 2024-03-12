@@ -8,10 +8,11 @@ use strum::IntoEnumIterator;
 type Point2 = glam::Vec2;
 
 #[derive(Debug, Clone)]
-struct Button {
+pub struct Button {
     frame: Mesh,
     text: Text,
-    rect: Rect,
+    pub rect: Rect,
+    pub el: Element,
 }
 type Buttons = Vec<Button>;
 
@@ -27,8 +28,8 @@ pub struct Renderer {
     pub scaling_factor: i32,
     // TODO: use this to cache the sandbox mesh (and any other Drawables that don't need to be
     // regenerated every frame)
-    pub mesh_sandbox: Option<Mesh>,
-    pub mesh_buttons: Option<Vec<Button>>,
+    mesh_sandbox: Option<Mesh>,
+    buttons: Option<Buttons>,
 }
 
 impl Renderer {
@@ -79,14 +80,14 @@ impl Renderer {
             font: font,
             scaling_factor: scaling_factor,
             mesh_sandbox: None,
-            mesh_buttons: None,
+            buttons: None,
         }
     }
 
     pub fn init(&mut self, ctx: &mut Context) {
         // some drawables don't have to be redrawn every time, so are saved in the renderer at init
         self.mesh_sandbox = Some(self.draw_sandbox(ctx, self.frame_sandbox));
-        self.mesh_buttons = Some(self.draw_element_selector(ctx));
+        self.buttons = Some(self.draw_element_selector(ctx));
     }
 
     pub fn get_scaling_factor(&self) -> i32 {
@@ -95,6 +96,18 @@ impl Renderer {
 
     pub fn get_frame_sandbox(&self) -> Rect {
         self.frame_sandbox.clone()
+    }
+
+    pub fn get_frame_element_selector(&self) -> Rect {
+        self.frame_element_selector.clone()
+    }
+
+    pub fn get_buttons(&self) -> Buttons {
+        if let Some(buttons) = self.buttons.clone() {
+            return buttons;
+        } else {
+            return vec![];
+        }
     }
 
     fn draw_fps(&self, ctx: &mut Context, frame: Rect, font: &Option<String>) -> GameResult<Text> {
@@ -126,7 +139,13 @@ impl Renderer {
         )
     }
 
-    fn draw_button(&self, ctx: &mut Context, button: Rect, text_str: String) -> Button {
+    fn draw_button(
+        &self,
+        ctx: &mut Context,
+        button: Rect,
+        text_str: String,
+        el: Element,
+    ) -> Button {
         // button outline
         let outline = Mesh::from_data(
             ctx,
@@ -155,6 +174,7 @@ impl Renderer {
             frame: outline,
             text: text,
             rect: button,
+            el: el,
         }
     }
 
@@ -173,7 +193,7 @@ impl Renderer {
                 w: self.frame_element_selector.w,
                 h: button_height,
             };
-            let button = self.draw_button(ctx, outline_rect, el.to_string());
+            let button = self.draw_button(ctx, outline_rect, el.to_string(), el);
             // then add to buttons vec
             element_selector.push(button);
             i += 1f32;
@@ -226,7 +246,7 @@ impl Renderer {
             &fps,
             DrawParam::default().dest(Point2::new(self.frame_fps.x, self.frame_fps.y)),
         );
-        for button in self.mesh_buttons.clone().unwrap().iter() {
+        for button in self.buttons.clone().unwrap().iter() {
             canvas.draw(
                 &button.frame,
                 DrawParam::default().dest(Point2::new(button.rect.x, button.rect.y)),

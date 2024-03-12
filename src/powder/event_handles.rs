@@ -50,12 +50,25 @@ pub fn mouse_button_down_event(
         input::mouse::MouseButton::Left => {
             // handle LMB
             debug!("Handling LMB at ({}, {})", x, y);
-            // TODO: probably need to make this a match to determine which box got clicked
+            // TODO: probably need to move this to the renderer because it
+            // shouldn't be the event handler's job to determine what ui has
+            // been clicked
             if click_in_rect(x, y, renderer.get_frame_sandbox()) {
                 // if clicked in sandbox
                 let coord = convert_coord_to_sandbox_coord(&renderer, x, y);
                 info!("Making atom at ({}, {})", coord.x, coord.y);
                 state.make_atom(coord).map_err(|err| info!("{}", err)).ok();
+                Ok(())
+            } else if click_in_rect(x, y, renderer.get_frame_element_selector()) {
+                // if clicked in element selector
+                let coord = convert_coord_to_sandbox_coord(&renderer, x, y);
+                info!("Clicked in element selector at ({}, {})", coord.x, coord.y);
+                for button in renderer.get_buttons() {
+                    if click_in_rect(x, y, button.rect) {
+                        // if clicked on button
+                        state.set_active_element(button.el);
+                    }
+                }
                 Ok(())
             } else {
                 // if clicked outside of sandbox
