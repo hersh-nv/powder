@@ -20,7 +20,7 @@ impl Powder {
     pub fn new(ctx: &mut Context) -> GameResult<Self> {
         let state = State::new(100); // hardcode sandbox size for now
         let assets = Assets::new(ctx)?;
-        let renderer = Renderer::new(ctx, &state);
+        let renderer = Renderer::new(ctx, &state, assets.font.clone());
         let mut powder = Powder {
             state: state,
             assets: assets,
@@ -30,9 +30,10 @@ impl Powder {
         Ok(powder)
     }
 
-    fn init(&mut self, _ctx: &mut Context) -> GameResult {
+    fn init(&mut self, ctx: &mut Context) -> GameResult {
         debug!("Core init");
         self.state.init();
+        self.renderer.init(ctx);
         Ok(())
     }
 }

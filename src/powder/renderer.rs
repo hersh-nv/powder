@@ -18,14 +18,16 @@ pub struct Renderer {
     frame_sandbox: Rect,
     frame_fps: Rect,
     frame_element_selector: Rect,
+    font: Option<String>,
     pub scaling_factor: i32,
     // TODO: use this to cache the sandbox mesh (and any other Drawables that don't need to be
     // regenerated every frame)
-    // pub mesh_sandbox: Option<Mesh>,
+    pub mesh_sandbox: Option<Mesh>,
+    pub mesh_buttons: Option<Vec<Button>>,
 }
 
 impl Renderer {
-    pub fn new(ctx: &Context, state: &State) -> Self {
+    pub fn new(ctx: &Context, state: &State, font: Option<String>) -> Self {
         // figure that the sandbox should take 80% of the smaller screen dimension?
         // and assuming square for now
         let (win_w, win_h) = ctx.gfx.drawable_size();
@@ -68,9 +70,18 @@ impl Renderer {
         Renderer {
             frame_sandbox: frame_sandbox,
             frame_fps: frame_fps,
-            scaling_factor: scaling_factor,
             frame_element_selector: frame_element_selector,
+            font: font,
+            scaling_factor: scaling_factor,
+            mesh_sandbox: None,
+            mesh_buttons: None,
         }
+    }
+
+    pub fn init(&mut self, ctx: &mut Context) {
+        // some drawables don't have to be redrawn every time, so are saved in the renderer at init
+        self.mesh_sandbox = Some(self.draw_sandbox(ctx, self.frame_sandbox));
+        self.mesh_buttons = Some(self.draw_element_selector(ctx, &self.font));
     }
 
     pub fn get_scaling_factor(&self) -> i32 {
@@ -96,17 +107,18 @@ impl Renderer {
         Ok(text)
     }
 
-    fn draw_sandbox(&self, ctx: &mut Context, sandbox: Rect) -> GameResult<Mesh> {
-        Ok(Mesh::from_data(
+    fn draw_sandbox(&self, ctx: &mut Context, sandbox: Rect) -> Mesh {
+        Mesh::from_data(
             ctx,
             MeshBuilder::new()
                 .rectangle(
                     DrawMode::stroke(1f32),
                     Rect::new(0f32, 0f32, sandbox.w + 1.0, sandbox.h + 1.0),
                     Color::WHITE,
-                )?
+                )
+                .expect("Couldn't draw sandbox mesh")
                 .build(),
-        ))
+        )
     }
 
     fn draw_button(
@@ -191,13 +203,12 @@ impl Renderer {
     pub fn draw(&self, ctx: &mut Context, state: &State, assets: &Assets) -> GameResult {
         // refresh screen
         let mut canvas = Canvas::from_frame(ctx, Color::BLACK);
+
         // all drawing steps here
-        let sandbox_m = self.draw_sandbox(ctx, self.frame_sandbox)?;
         let atoms_m = self.draw_atoms(ctx, state.get_atoms(), self.get_scaling_factor() as i32)?;
-        let fps = self.draw_fps(ctx, self.frame_fps, &assets.font)?;
-        let element_sel_m = self.draw_element_selector(ctx, &assets.font);
+        let fps = self.draw_fps(ctx, self.frame_fps, &self.font)?;
         canvas.draw(
-            &sandbox_m,
+            &self.mesh_sandbox.clone().unwrap(),
             DrawParam::default().dest(Point2::new(self.frame_sandbox.x, self.frame_sandbox.y)),
         );
         canvas.draw(
@@ -208,7 +219,7 @@ impl Renderer {
             &fps,
             DrawParam::default().dest(Point2::new(self.frame_fps.x, self.frame_fps.y)),
         );
-        for button in element_sel_m.iter() {
+        for button in self.mesh_buttons.clone().unwrap().iter() {
             canvas.draw(
                 &button.0,
                 DrawParam::default().dest(Point2::new(
