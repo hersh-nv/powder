@@ -7,6 +7,8 @@ pub mod settings;
 use settings::*;
 pub mod atom;
 use atom::*;
+pub mod cells;
+use cells::*;
 
 pub type SandboxCoordinate = Vector2<i32>;
 
@@ -24,6 +26,7 @@ pub type Atoms = Vec<Atom>;
 #[derive(Clone)]
 pub struct State {
     pub settings: Settings,
+    cells: Cells,
     atoms: Atoms,
 }
 
@@ -32,6 +35,7 @@ impl State {
         State {
             settings: Settings::new(sandbox_size),
             atoms: vec![],
+            cells: Cells::new(sandbox_size),
         }
     }
 
@@ -80,6 +84,9 @@ impl State {
             )))
         } else {
             self.atoms.push(Atom::new(coord, element));
+            self.cells
+                .fill_cell(Atom::new(coord, element))
+                .expect("Couldn't fill cell");
             Ok(())
         }
     }
@@ -121,7 +128,11 @@ impl State {
             }
         }
         for atom in &mut self.atoms {
+            self.cells.clear_cell(atom.coord);
             atom.update();
+            self.cells
+                .fill_cell(atom.clone())
+                .expect("Couldn't fill cell");
         }
     }
 }
@@ -171,5 +182,27 @@ mod tests {
         if let Some(atom) = state.get_atoms().get(0) {
             assert_eq!(atom.coord, SandboxCoordinate { x: 2, y: 4 });
         }
+    }
+
+    #[test]
+    fn cells_updates_in_correct_spot() {
+        let mut state = State::new(5);
+        state
+            .make_atom(SandboxCoordinate { x: 2, y: 2 }, Element::Sand)
+            .ok();
+        assert!(state
+            .cells
+            .get_cell_contents(SandboxCoordinate { x: 2, y: 2 })
+            .is_some());
+        // after update, check that cells updates properly
+        state.update_atoms();
+        assert!(state
+            .cells
+            .get_cell_contents(SandboxCoordinate { x: 2, y: 2 })
+            .is_none());
+        assert!(state
+            .cells
+            .get_cell_contents(SandboxCoordinate { x: 2, y: 3 })
+            .is_some());
     }
 }

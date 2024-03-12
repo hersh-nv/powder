@@ -2,6 +2,7 @@ use anyhow::Result;
 use thiserror::Error;
 
 use super::Atom;
+use super::Element;
 use super::SandboxCoordinate;
 
 #[derive(Error, Debug)]
@@ -29,10 +30,10 @@ impl Cells {
     }
 
     pub fn fill_cell(&mut self, atom: Atom) -> Result<()> {
-        if let Some(atom) = self.get_cell_contents(atom.coord) {
+        if let Some(atom_exists) = self.get_cell_contents(atom.coord) {
             Err(CellsError::CouldNotFillCell {
-                x: atom.coord.x,
-                y: atom.coord.y,
+                x: atom_exists.coord.x,
+                y: atom_exists.coord.y,
             }.into())
         } else {
             self.array[(atom.coord.y * self.size.0 + atom.coord.x) as usize] = Some(atom);

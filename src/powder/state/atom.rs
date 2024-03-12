@@ -95,10 +95,14 @@ impl Atom {
         // element is true if that coord contains an atom and false if it
         // doesn't
         assert_eq!(neighbourhood.len(), 8);
-        debug!("{self:?}, {neighbourhood:?}");
         let (dx, dy) = self.element.calculate_move(neighbourhood);
         self.next_coord.x = self.coord.x + dx;
         self.next_coord.y = self.coord.y + dy;
+        debug!("{self:?}");
+    }
+
+    pub fn reset_next(&mut self) {
+        self.next_coord = self.coord;
     }
 
     pub fn update(&mut self) {
