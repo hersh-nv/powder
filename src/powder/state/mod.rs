@@ -39,15 +39,7 @@ impl State {
         }
     }
 
-    pub fn init(&mut self) {
-        // stub init: make some test atoms
-        self.make_atom(SandboxCoordinate { x: 0, y: 0 }, Element::Sand)
-            .ok();
-        self.make_atom(SandboxCoordinate { x: 10, y: 10 }, Element::Sand)
-            .ok();
-        self.make_atom(SandboxCoordinate { x: 20, y: 20 }, Element::Sand)
-            .ok();
-    }
+    pub fn init(&mut self) {}
 
     fn atom_out_of_bounds(&self, coord: SandboxCoordinate) -> bool {
         coord.x < 0
