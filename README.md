@@ -6,9 +6,9 @@ a powdertoy / sandbox written with [ggez](https://ggez.rs/).
 
 - [x] sandbox
 - [x] draw sand inside
-- [ ] clear button
-- [ ] change scaling dynamically
-- [ ] gravity
+- [x] gravity
+- [x] fluids
+- [ ] eraser
 - [ ] viscosity
+- [ ] clear button
 - [ ] air pressure
-- [ ] fluids
