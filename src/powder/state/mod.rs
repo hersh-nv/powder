@@ -128,11 +128,17 @@ impl State {
             }
         }
         for atom in &mut self.atoms {
-            self.cells.clear_cell(atom.coord);
-            atom.update();
-            self.cells
-                .fill_cell(atom.clone())
-                .expect("Couldn't fill cell");
+            // destination cell might have been filled by another atom
+            // if so, don't move, and clear next coord
+            if let Some(_) = self.cells.get_cell_contents(atom.next_coord) {
+                atom.reset_next();
+            } else {
+                self.cells.clear_cell(atom.coord);
+                atom.update();
+                self.cells
+                    .fill_cell(atom.clone())
+                    .expect("Couldn't fill cell");
+            }
         }
     }
 }
@@ -190,19 +196,10 @@ mod tests {
         state
             .make_atom(SandboxCoordinate { x: 2, y: 2 }, Element::Sand)
             .ok();
-        assert!(state
-            .cells
-            .get_cell_contents(SandboxCoordinate { x: 2, y: 2 })
-            .is_some());
+        assert!(state.cells.get_cell_contents(SandboxCoordinate{ x: 2, y: 2}).is_some());
         // after update, check that cells updates properly
         state.update_atoms();
-        assert!(state
-            .cells
-            .get_cell_contents(SandboxCoordinate { x: 2, y: 2 })
-            .is_none());
-        assert!(state
-            .cells
-            .get_cell_contents(SandboxCoordinate { x: 2, y: 3 })
-            .is_some());
+        assert!(state.cells.get_cell_contents(SandboxCoordinate{ x: 2, y: 2}).is_none());
+        assert!(state.cells.get_cell_contents(SandboxCoordinate{ x: 2, y: 3}).is_some());
     }
 }
