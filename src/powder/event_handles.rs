@@ -55,10 +55,7 @@ pub fn mouse_button_down_event(
                 // if clicked in sandbox
                 let coord = convert_coord_to_sandbox_coord(&renderer, x, y);
                 info!("Making atom at ({}, {})", coord.x, coord.y);
-                state
-                    .make_atom(coord, atom::Element::Water)
-                    .map_err(|err| info!("{}", err))
-                    .ok();
+                state.make_atom(coord).map_err(|err| info!("{}", err)).ok();
                 Ok(())
             } else {
                 // if clicked outside of sandbox

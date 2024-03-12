@@ -28,6 +28,7 @@ pub struct State {
     pub parameters: Parameters,
     cells: Cells,
     atoms: Atoms,
+    active_element: Element,
 }
 
 impl State {
@@ -36,6 +37,7 @@ impl State {
             parameters: Parameters::new(sandbox_size),
             atoms: vec![],
             cells: Cells::new(sandbox_size),
+            active_element: Element::Sand,
         }
     }
 
@@ -56,11 +58,7 @@ impl State {
         false
     }
 
-    pub fn make_atom(
-        &mut self,
-        coord: SandboxCoordinate,
-        element: Element,
-    ) -> Result<(), StateError> {
+    pub fn make_atom(&mut self, coord: SandboxCoordinate) -> Result<(), StateError> {
         if self.atom_out_of_bounds(coord) {
             Err(StateError::AtomError(String::from("Atom out of bounds")))
         } else if self.atom_exists_here(coord) {
@@ -68,9 +66,9 @@ impl State {
                 "Atom already exists here",
             )))
         } else {
-            self.atoms.push(Atom::new(coord, element));
+            self.atoms.push(Atom::new(coord, self.active_element));
             self.cells
-                .fill_cell(Atom::new(coord, element))
+                .fill_cell(Atom::new(coord, self.active_element))
                 .expect("Couldn't fill cell");
             Ok(())
         }
@@ -136,12 +134,8 @@ mod tests {
     fn make_and_update_three_atoms() {
         // init with two atoms
         let mut state = State::new(10);
-        state
-            .make_atom(SandboxCoordinate { x: 3, y: 3 }, Element::Sand)
-            .ok();
-        state
-            .make_atom(SandboxCoordinate { x: 4, y: 4 }, Element::Sand)
-            .ok();
+        state.make_atom(SandboxCoordinate { x: 3, y: 3 }).ok();
+        state.make_atom(SandboxCoordinate { x: 4, y: 4 }).ok();
         // these two should fall straight down
         state.update_atoms();
         if let Some(atom) = state.get_atoms().get(0) {
@@ -151,9 +145,7 @@ mod tests {
             assert_eq!(atom.coord, SandboxCoordinate { x: 4, y: 5 });
         }
         // add a third atom under the top one
-        state
-            .make_atom(SandboxCoordinate { x: 3, y: 5 }, Element::Sand)
-            .ok();
+        state.make_atom(SandboxCoordinate { x: 3, y: 5 }).ok();
         // top one should now fall down to the left
         state.update_atoms();
         if let Some(atom) = state.get_atoms().get(0) {
@@ -164,9 +156,7 @@ mod tests {
     #[test]
     fn atom_collides_with_ground() {
         let mut state = State::new(5);
-        state
-            .make_atom(SandboxCoordinate { x: 2, y: 2 }, Element::Sand)
-            .ok();
+        state.make_atom(SandboxCoordinate { x: 2, y: 2 }).ok();
         state.update_atoms(); // should be at [2,3]
         state.update_atoms(); // should be at [2,4]
         state.update_atoms(); // should be at [2,4]
@@ -178,9 +168,7 @@ mod tests {
     #[test]
     fn cells_updates_in_correct_spot() {
         let mut state = State::new(5);
-        state
-            .make_atom(SandboxCoordinate { x: 2, y: 2 }, Element::Sand)
-            .ok();
+        state.make_atom(SandboxCoordinate { x: 2, y: 2 }).ok();
         assert!(state
             .cells
             .get_cell_contents(SandboxCoordinate { x: 2, y: 2 })
