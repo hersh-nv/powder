@@ -13,6 +13,7 @@ impl std::fmt::Display for RendererError {
         write!(f, "Couldn't make this settings change")
     }
 }
+#[derive(Debug)]
 pub struct Renderer {
     frame_sandbox: Rect,
     frame_fps: Rect,
@@ -46,10 +47,10 @@ impl Renderer {
         );
 
         // calc fps frame
-        let fps_w = 100f32;
+        let fps_w = 200f32;
         let fps_h = 20f32;
         let frame_fps = Rect::new(
-            frame_sandbox.x + frame_sandbox.w - fps_w,
+            frame_sandbox.x + frame_sandbox.w,
             frame_sandbox.y - fps_h,
             fps_w,
             fps_h,
