@@ -1,6 +1,7 @@
 use log::debug;
 
 use ggez::graphics::Color;
+use strum_macros::EnumIter;
 
 use super::SandboxCoordinate;
 
@@ -22,13 +23,20 @@ fn heads_or_zip() -> i32 {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, EnumIter)]
 pub enum Element {
     Sand,
     Water,
 }
 
 impl Element {
+    pub fn to_string(&self) -> String {
+        match self {
+            Element::Sand => "sand".to_string(),
+            Element::Water => "water".to_string(),
+        }
+    }
+
     fn color(&self) -> Color {
         match self {
             Element::Sand => Color::WHITE,

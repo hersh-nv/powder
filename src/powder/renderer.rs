@@ -1,9 +1,14 @@
 use super::assets::Assets;
+use super::state::atom::Element;
 use super::state::Atoms;
 use super::state::State;
 use ggez::{graphics::*, Context, GameResult};
+use strum::IntoEnumIterator;
 
 type Point2 = glam::Vec2;
+
+type Button = (Mesh, Text);
+type Buttons = Vec<Button>;
 
 #[derive(Debug)]
 pub struct RendererError;
@@ -12,6 +17,7 @@ pub struct RendererError;
 pub struct Renderer {
     frame_sandbox: Rect,
     frame_fps: Rect,
+    frame_element_selector: Rect,
     pub scaling_factor: i32,
     // TODO: use this to cache the sandbox mesh (and any other Drawables that don't need to be
     // regenerated every frame)
@@ -51,10 +57,19 @@ impl Renderer {
             fps_h,
         );
 
+        // calc element buttons
+        let frame_element_selector = Rect::new(
+            frame_sandbox.x + frame_sandbox.w + 10f32,
+            frame_sandbox.y,
+            100f32,
+            frame_sandbox.h,
+        );
+
         Renderer {
             frame_sandbox: frame_sandbox,
             frame_fps: frame_fps,
             scaling_factor: scaling_factor,
+            frame_element_selector: frame_element_selector,
         }
     }
 
@@ -81,6 +96,72 @@ impl Renderer {
         Ok(text)
     }
 
+    fn draw_sandbox(&self, ctx: &mut Context, sandbox: Rect) -> GameResult<Mesh> {
+        Ok(Mesh::from_data(
+            ctx,
+            MeshBuilder::new()
+                .rectangle(
+                    DrawMode::stroke(1f32),
+                    Rect::new(0f32, 0f32, sandbox.w + 1.0, sandbox.h + 1.0),
+                    Color::WHITE,
+                )?
+                .build(),
+        ))
+    }
+
+    fn draw_button(
+        &self,
+        ctx: &mut Context,
+        button: Rect,
+        text_str: String,
+        font: &Option<String>,
+    ) -> Button {
+        // button outline
+        let outline = Mesh::from_data(
+            ctx,
+            MeshBuilder::new()
+                .rectangle(
+                    DrawMode::stroke(1f32),
+                    Rect::new(0f32, 0f32, button.w + 1f32, button.h + 1f32),
+                    Color::WHITE,
+                )
+                .expect("Couldn't draw button")
+                .build(),
+        );
+        // button text
+        let mut text = Text::new(TextFragment {
+            text: text_str,
+            color: Some(Color::WHITE),
+            font: font.clone(),
+            scale: Some(PxScale::from(10f32)),
+        });
+        text.set_bounds(Point2::new(button.x, button.y));
+        text.set_layout(TextLayout {
+            h_align: TextAlign::Begin,
+            v_align: TextAlign::Middle,
+        });
+
+        return (outline, text);
+    }
+
+    fn draw_element_selector(&self, ctx: &mut Context, font: &Option<String>) -> Buttons {
+        let mut element_selector: Vec<(Mesh, Text)> = vec![];
+        // can't enumerate an enum so gotta keep an index separately
+        let i = 0f32;
+        for el in Element::iter() {
+            let button_height = 20f32;
+            let outline_rect = Rect {
+                x: self.frame_element_selector.x,
+                y: self.frame_element_selector.y + self.frame_element_selector.h
+                    - i * (button_height + 10f32),
+                w: self.frame_element_selector.w,
+                h: button_height,
+            };
+            element_selector.push(self.draw_button(ctx, outline_rect, el.to_string(), font));
+        }
+        return element_selector;
+    }
+
     fn draw_atoms(
         &self,
         ctx: &mut Context,
@@ -105,19 +186,6 @@ impl Renderer {
             .expect("Couldn't draw atom");
         }
         Ok(Mesh::from_data(ctx, mb.build()))
-    }
-
-    fn draw_sandbox(&self, ctx: &mut Context, sandbox: Rect) -> GameResult<Mesh> {
-        Ok(Mesh::from_data(
-            ctx,
-            MeshBuilder::new()
-                .rectangle(
-                    DrawMode::stroke(1f32),
-                    Rect::new(0f32, 0f32, sandbox.w + 1.0, sandbox.h + 1.0),
-                    Color::WHITE,
-                )?
-                .build(),
-        ))
     }
 
     pub fn draw(&self, ctx: &mut Context, state: &State, assets: &Assets) -> GameResult {
