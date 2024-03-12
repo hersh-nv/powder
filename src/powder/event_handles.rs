@@ -23,11 +23,7 @@ fn click_in_rect(x: f32, y: f32, rect: graphics::Rect) -> bool {
     x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h
 }
 
-fn convert_coord_to_sandbox_coord(
-    renderer: &Renderer,
-    x: f32,
-    y: f32,
-) -> SandboxCoordinate {
+fn convert_coord_to_sandbox_coord(renderer: &Renderer, x: f32, y: f32) -> SandboxCoordinate {
     // even though state.make_atom() checks invalid mutation, check here as well that we're not
     // getting underflows or anything silly
     SandboxCoordinate {

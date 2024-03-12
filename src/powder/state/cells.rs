@@ -2,7 +2,6 @@ use anyhow::Result;
 use thiserror::Error;
 
 use super::Atom;
-use super::Element;
 use super::SandboxCoordinate;
 
 #[derive(Error, Debug)]
@@ -34,7 +33,8 @@ impl Cells {
             Err(CellsError::CouldNotFillCell {
                 x: atom_exists.coord.x,
                 y: atom_exists.coord.y,
-            }.into())
+            }
+            .into())
         } else {
             self.array[(atom.coord.y * self.size.0 + atom.coord.x) as usize] = Some(atom);
             Ok(())

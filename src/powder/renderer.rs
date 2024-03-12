@@ -17,7 +17,6 @@ pub struct Renderer {
     frame_sandbox: Rect,
     frame_fps: Rect,
     pub scaling_factor: i32,
-
     // TODO: use this to cache the sandbox mesh (and any other Drawables that don't need to be
     // regenerated every frame)
     // pub mesh_sandbox: Option<Mesh>,
@@ -79,11 +78,19 @@ impl Renderer {
             scale: Some(PxScale::from(20.0)),
         });
         text.set_bounds(Point2::new(frame.w, 100.0));
-        text.set_layout(TextLayout { h_align: TextAlign::End, v_align: TextAlign::Middle });
+        text.set_layout(TextLayout {
+            h_align: TextAlign::End,
+            v_align: TextAlign::Middle,
+        });
         Ok(text)
     }
-    
-    fn draw_atoms(&self, ctx: &mut Context, atoms: &Atoms, scaling_factor: i32) -> GameResult<Mesh> {
+
+    fn draw_atoms(
+        &self,
+        ctx: &mut Context,
+        atoms: &Atoms,
+        scaling_factor: i32,
+    ) -> GameResult<Mesh> {
         // TODO: proper co-ordinate conversion
         let mb = &mut MeshBuilder::new();
         for atom in atoms {
@@ -103,52 +110,41 @@ impl Renderer {
         }
         Ok(Mesh::from_data(ctx, mb.build()))
     }
-    
+
     fn draw_sandbox(&self, ctx: &mut Context, sandbox: Rect) -> GameResult<Mesh> {
-        Ok(Mesh::from_data(ctx, MeshBuilder::new()
-            .rectangle(
-                DrawMode::stroke(1f32),
-                Rect::new(0f32, 0f32, sandbox.w + 1.0, sandbox.h + 1.0),
-                Color::WHITE,
-            )?
-            .build()))
+        Ok(Mesh::from_data(
+            ctx,
+            MeshBuilder::new()
+                .rectangle(
+                    DrawMode::stroke(1f32),
+                    Rect::new(0f32, 0f32, sandbox.w + 1.0, sandbox.h + 1.0),
+                    Color::WHITE,
+                )?
+                .build(),
+        ))
     }
-    
+
     pub fn draw(&self, ctx: &mut Context, state: &State, assets: &Assets) -> GameResult {
         // refresh screen
         let mut canvas = Canvas::from_frame(ctx, Color::BLACK);
         // all drawing steps here
         let sandbox_m = self.draw_sandbox(ctx, self.frame_sandbox)?;
-        let atoms_m = self.draw_atoms(
-            ctx,
-            state.get_atoms(),
-            self.get_scaling_factor() as i32,
-        )?;
+        let atoms_m = self.draw_atoms(ctx, state.get_atoms(), self.get_scaling_factor() as i32)?;
         let text = self.draw_fps(ctx, self.frame_fps, &assets.font)?;
         canvas.draw(
             &sandbox_m,
-            DrawParam::default().dest(Point2::new(
-                self.frame_sandbox.x,
-                self.frame_sandbox.y,
-            )),
+            DrawParam::default().dest(Point2::new(self.frame_sandbox.x, self.frame_sandbox.y)),
         );
         canvas.draw(
             &atoms_m,
-            DrawParam::default().dest(Point2::new(
-                self.frame_sandbox.x,
-                self.frame_sandbox.y,
-            )),
+            DrawParam::default().dest(Point2::new(self.frame_sandbox.x, self.frame_sandbox.y)),
         );
         canvas.draw(
             &text,
-            DrawParam::default().dest(Point2::new(
-                self.frame_fps.x,
-                self.frame_fps.y,
-            )),
+            DrawParam::default().dest(Point2::new(self.frame_fps.x, self.frame_fps.y)),
         );
         // output drawing
         canvas.finish(ctx)?;
         Ok(())
     }
 }
-

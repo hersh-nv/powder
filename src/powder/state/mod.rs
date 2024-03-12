@@ -189,10 +189,19 @@ mod tests {
         state
             .make_atom(SandboxCoordinate { x: 2, y: 2 }, Element::Sand)
             .ok();
-        assert!(state.cells.get_cell_contents(SandboxCoordinate{ x: 2, y: 2}).is_some());
+        assert!(state
+            .cells
+            .get_cell_contents(SandboxCoordinate { x: 2, y: 2 })
+            .is_some());
         // after update, check that cells updates properly
         state.update_atoms();
-        assert!(state.cells.get_cell_contents(SandboxCoordinate{ x: 2, y: 2}).is_none());
-        assert!(state.cells.get_cell_contents(SandboxCoordinate{ x: 2, y: 3}).is_some());
+        assert!(state
+            .cells
+            .get_cell_contents(SandboxCoordinate { x: 2, y: 2 })
+            .is_none());
+        assert!(state
+            .cells
+            .get_cell_contents(SandboxCoordinate { x: 2, y: 3 })
+            .is_some());
     }
 }
