@@ -56,17 +56,10 @@ impl State {
             || coord.y >= self.settings.sandbox_h
     }
 
-    fn atom_collision(&self, coord: SandboxCoordinate) -> bool {
-        for atom in &self.atoms {
-            if coord.x != atom.coord.x {
-                continue;
-            } else {
-                if coord.y != atom.coord.y {
-                    continue;
-                } else {
-                    return true;
-                }
-            }
+    fn atom_exists_here(&self, coord: SandboxCoordinate) -> bool {
+        log::debug!("{coord:?}");
+        if let Some(_) = self.cells.get_cell_contents(coord) {
+            return true;
         }
         false
     }
@@ -78,7 +71,7 @@ impl State {
     ) -> Result<(), StateError> {
         if self.atom_out_of_bounds(coord) {
             Err(StateError::AtomError(String::from("Atom out of bounds")))
-        } else if self.atom_collision(coord) {
+        } else if self.atom_exists_here(coord) {
             Err(StateError::AtomError(String::from(
                 "Atom already exists here",
             )))
@@ -106,7 +99,7 @@ impl State {
                     x: atom.coord.x + dx,
                     y: atom.coord.y + dy,
                 };
-                if self.atom_collision(target) || self.atom_out_of_bounds(target) {
+                if self.atom_out_of_bounds(target) || self.atom_exists_here(target) {
                     neighbourhood.push(true);
                 } else {
                     neighbourhood.push(false);
