@@ -8,11 +8,6 @@ type Point2 = glam::Vec2;
 #[derive(Debug)]
 pub struct RendererError;
 
-impl std::fmt::Display for RendererError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Couldn't make this settings change")
-    }
-}
 #[derive(Debug)]
 pub struct Renderer {
     frame_sandbox: Rect,
@@ -34,9 +29,9 @@ impl Renderer {
         } else {
             sandbox_size_px = (win_w * 0.8) as i32;
         }
-        let sandbox_size_px = sandbox_size_px - sandbox_size_px % state.settings.sandbox_w;
+        let sandbox_size_px = sandbox_size_px - sandbox_size_px % state.parameters.sandbox_w;
         // calc scaling factor based on this -- do we still need it?
-        let scaling_factor = sandbox_size_px / state.settings.sandbox_w;
+        let scaling_factor = sandbox_size_px / state.parameters.sandbox_w;
 
         // calc sandbox frame
         let frame_sandbox = Rect::new(

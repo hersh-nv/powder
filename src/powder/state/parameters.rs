@@ -1,19 +1,19 @@
 #[derive(Debug)]
-pub struct SettingsError;
+pub struct ParameterError;
 
-impl std::fmt::Display for SettingsError {
+impl std::fmt::Display for ParameterError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Couldn't make this settings change")
+        write!(f, "Couldn't make this parameter change")
     }
 }
 
 #[derive(Clone)]
-pub struct Settings {
+pub struct Parameters {
     pub sandbox_w: i32,
     pub sandbox_h: i32,
 }
 
-impl Settings {
+impl Parameters {
     pub fn new(sandbox_size: i32) -> Self {
         let sandbox_w = sandbox_size;
         let sandbox_h = sandbox_size;
@@ -21,7 +21,7 @@ impl Settings {
         // so let's just mandate that for now
         assert_eq!(sandbox_w, sandbox_h);
 
-        Settings {
+        Parameters {
             sandbox_w: sandbox_w,
             sandbox_h: sandbox_h,
         }

@@ -3,8 +3,8 @@ use anyhow::Result;
 use ggez::mint::Vector2;
 use thiserror::Error;
 
-pub mod settings;
-use settings::*;
+pub mod parameters;
+use parameters::*;
 pub mod atom;
 use atom::*;
 pub mod cells;
@@ -25,7 +25,7 @@ pub type Atoms = Vec<Atom>;
 /* State */
 #[derive(Clone)]
 pub struct State {
-    pub settings: Settings,
+    pub parameters: Parameters,
     cells: Cells,
     atoms: Atoms,
 }
@@ -33,7 +33,7 @@ pub struct State {
 impl State {
     pub fn new(sandbox_size: i32) -> Self {
         State {
-            settings: Settings::new(sandbox_size),
+            parameters: Parameters::new(sandbox_size),
             atoms: vec![],
             cells: Cells::new(sandbox_size),
         }
@@ -43,9 +43,9 @@ impl State {
 
     fn atom_out_of_bounds(&self, coord: SandboxCoordinate) -> bool {
         coord.x < 0
-            || coord.x >= self.settings.sandbox_w
+            || coord.x >= self.parameters.sandbox_w
             || coord.y < 0
-            || coord.y >= self.settings.sandbox_h
+            || coord.y >= self.parameters.sandbox_h
     }
 
     fn atom_exists_here(&self, coord: SandboxCoordinate) -> bool {
